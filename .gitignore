@@ -43,6 +43,10 @@ yarn-error.log*
 # Claude Code — configuração pessoal da máquina, não do projeto
 .claude/settings.local.json
 
+# Supabase CLI — estado local da instância local (Docker), não do projeto
+supabase/.branches
+supabase/.temp
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
