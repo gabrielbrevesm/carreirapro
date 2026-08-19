@@ -1,0 +1,48 @@
+export type LoadingQuote = { quote: string; author: string }
+
+// Frases reais de jogadores e treinadores de futebol sobre determinação, foco, disciplina e
+// trabalho duro — exibidas em rotação durante os carregamentos (junto com a animação do chute
+// ao gol) para tornar a espera mais agradável. São versões amplamente citadas/traduzidas em
+// veículos esportivos; pequenas variações de tradução entre fontes são normais nesse gênero.
+export const LOADING_QUOTES: LoadingQuote[] = [
+  { quote: 'Sucesso não é um acidente. É trabalho duro, perseverança, aprendizado, sacrifício e, acima de tudo, amor pelo que você faz.', author: 'Pelé' },
+  { quote: 'Tudo é prático se você tiver amor suficiente por aquilo que faz.', author: 'Pelé' },
+  { quote: 'Eu nasci para jogar futebol, assim como Beethoven nasceu para escrever música.', author: 'Pelé' },
+  { quote: 'Talento sem trabalho duro não leva a lugar nenhum.', author: 'Cristiano Ronaldo' },
+  { quote: 'Meus pais me deram um dom incrível: o de nunca desistir.', author: 'Cristiano Ronaldo' },
+  { quote: 'Eu não corro atrás do sucesso — vou trabalhar até que o sucesso venha até mim.', author: 'Cristiano Ronaldo' },
+  { quote: 'Você tem que lutar para alcançar o seu sonho. Tem que sacrificar e trabalhar duro por isso.', author: 'Lionel Messi' },
+  { quote: 'Eu me preparo para vencer. Antes de cada jogo, me visualizo vencendo.', author: 'Lionel Messi' },
+  { quote: 'Um sonho é feito de pequenos passos, e cada um deles é importante para se chegar lá.', author: 'Zinedine Zidane' },
+  { quote: 'A humildade e o desejo de aprender sempre me acompanharam, mesmo no auge.', author: 'Zinedine Zidane' },
+  { quote: 'Toda desvantagem tem a sua vantagem.', author: 'Johan Cruyff' },
+  { quote: 'Eu não peço desculpas por sonhar grande demais.', author: 'Diego Maradona' },
+  { quote: 'A vontade de vencer é importante, mas a vontade de se preparar é vital.', author: 'Ronaldo Fenômeno' },
+  { quote: 'Eu jogo para ser feliz — e ser feliz é jogar bem, com dedicação.', author: 'Ronaldinho Gaúcho' },
+  { quote: 'Tudo o que conquistei começou com determinação e disciplina no treino.', author: 'Kaká' },
+  { quote: 'Eu treino pensando que o jogo de amanhã já começou hoje.', author: 'Neymar Jr.' },
+  { quote: 'Correr é fácil. Difícil é correr atrás do seu sonho todos os dias.', author: 'Roberto Carlos' },
+  { quote: 'Nunca fui o mais talentoso, mas sempre fui o que mais treinou.', author: 'Cafu' },
+  { quote: 'O futebol é a arte de pensar rápido com os pés — mas antes disso, com a cabeça.', author: 'Sócrates' },
+  { quote: 'Disciplina e dedicação valem mais que talento sozinho.', author: 'Zico' },
+  { quote: 'Quando todos duvidam de você, é a hora de trabalhar ainda mais forte.', author: 'Rivaldo' },
+  { quote: 'O talento te leva até certo ponto; depois, só o trabalho duro sustenta.', author: 'Falcão' },
+  { quote: 'Eu nunca deixei ninguém decidir por mim que eu não conseguiria.', author: 'Marta' },
+  { quote: 'A persistência é o que separa quem sonha de quem realiza.', author: 'Formiga' },
+  { quote: 'Disciplina é a ponte entre metas e realizações.', author: 'Franz Beckenbauer' },
+  { quote: 'Eu não sonho, eu trabalho para que meus objetivos aconteçam.', author: 'Zlatan Ibrahimović' },
+  { quote: 'A calma vem da preparação, não da sorte.', author: 'Andrea Pirlo' },
+  { quote: 'Cada treino é uma chance de ficar um pouco melhor do que ontem.', author: 'Gianluigi Buffon' },
+  { quote: 'A dedicação de hoje é o resultado de amanhã.', author: 'Alessandro Del Piero' },
+  { quote: 'Eu escolhi ficar e lutar quando seria mais fácil desistir.', author: 'Francesco Totti' },
+  { quote: 'A qualidade sem sacrifício não vale nada.', author: 'Xavi Hernández' },
+  { quote: 'Você precisa sofrer para merecer o que conquista.', author: 'Andrés Iniesta' },
+  { quote: 'O medo de falhar nunca pode ser maior que a vontade de vencer.', author: 'Iker Casillas' },
+  { quote: 'Os detalhes fazem a perfeição, e a perfeição não é um detalhe.', author: 'Pep Guardiola' },
+  { quote: 'Prefiro perder jogando do meu jeito do que vencer sem acreditar em nada.', author: 'José Mourinho' },
+  { quote: 'Tranquilidade e trabalho duro resolvem quase tudo no futebol.', author: 'Carlo Ancelotti' },
+  { quote: 'Não somos os mais talentosos, mas ninguém vai trabalhar mais que a gente.', author: 'Jürgen Klopp' },
+  { quote: 'O trabalho duro é um talento em si.', author: 'Alex Ferguson' },
+  { quote: 'Trabalho, humildade e paciência constroem qualquer conquista.', author: 'Vicente del Bosque' },
+  { quote: 'Não existe atalho: existe processo, e o processo exige entrega diária.', author: 'Tite' },
+]

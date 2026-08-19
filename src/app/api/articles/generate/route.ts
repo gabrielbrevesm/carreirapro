@@ -1,0 +1,72 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getOpenAIClient, getConfiguredModel } from '@/lib/ai/openai-client'
+import { MASTER_SYSTEM_PROMPT, buildUserMessage } from '@/lib/ai/article-prompt'
+import { createClient } from '@/lib/supabase/server'
+import { createAdminClient } from '@/lib/supabase/admin'
+import { checkAndReserveQuota } from '@/lib/supabase/quota'
+import type { Career, CareerMemory } from '@/types'
+import type { AiArticleResponse } from '@/lib/ai/types'
+
+export async function POST(req: NextRequest) {
+  const client = getOpenAIClient()
+  if (!client) {
+    // Sem chave configurada — sinaliza ao cliente para usar o gerador mock local.
+    return NextResponse.json({ error: 'AI_NOT_CONFIGURED' }, { status: 503 })
+  }
+
+  let body: { career: Career; memory: CareerMemory; rawInput: string; isFirstEvent: boolean }
+  try {
+    body = await req.json()
+  } catch {
+    return NextResponse.json({ error: 'INVALID_BODY' }, { status: 400 })
+  }
+
+  if (!body.career || !body.memory || typeof body.rawInput !== 'string') {
+    return NextResponse.json({ error: 'INVALID_BODY' }, { status: 400 })
+  }
+
+  // Cota real, verificada no banco (nunca confia no plano que o client alega) — protege o
+  // gasto com a OpenAI. A matéria de boas-vindas (isFirstEvent) não consome cota.
+  if (!body.isFirstEvent) {
+    const admin = createAdminClient()
+    if (admin) {
+      const supabaseServer = await createClient()
+      const quota = await checkAndReserveQuota(supabaseServer, admin, 'articlesGenerated')
+      if (!quota.ok) return NextResponse.json({ error: quota.error }, { status: quota.status })
+    }
+  }
+
+  const model = getConfiguredModel()
+  const startTime = Date.now()
+
+  try {
+    const completion = await client.chat.completions.create({
+      model,
+      messages: [
+        { role: 'system', content: MASTER_SYSTEM_PROMPT },
+        { role: 'user', content: buildUserMessage(body) },
+      ],
+      temperature: 0.9,
+      response_format: { type: 'json_object' },
+    })
+
+    const content = completion.choices[0]?.message?.content
+    if (!content) throw new Error('Resposta vazia do modelo')
+
+    const parsed = JSON.parse(content) as AiArticleResponse
+
+    if (!parsed.headline || !parsed.body) {
+      throw new Error('Resposta em formato inesperado')
+    }
+
+    return NextResponse.json({
+      ...parsed,
+      modelUsed: model,
+      tokensUsed: completion.usage?.total_tokens ?? 0,
+      generationTimeMs: Date.now() - startTime,
+    })
+  } catch (error) {
+    console.error('[/api/articles/generate]', error)
+    return NextResponse.json({ error: 'GENERATION_FAILED' }, { status: 502 })
+  }
+}
