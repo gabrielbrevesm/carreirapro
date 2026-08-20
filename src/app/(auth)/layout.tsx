@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Newspaper } from 'lucide-react'
 import { useMockData } from '@/lib/mock/store'
@@ -8,17 +8,15 @@ import { useMockData } from '@/lib/mock/store'
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const { state, isHydrated, getMostRecentCareer } = useMockData()
-  const checkedRef = useRef(false)
 
   useEffect(() => {
-    // Só verifica uma vez, na hidratação inicial — evita competir com o redirect
-    // explícito que login/signup disparam após autenticar nesta própria página.
-    if (!isHydrated || checkedRef.current) return
-    checkedRef.current = true
-    if (state.isAuthenticated) {
-      const recent = getMostRecentCareer()
-      router.replace(recent ? `/careers/${recent.slug}` : '/onboarding')
-    }
+    // Reage a QUALQUER mudança de isAuthenticated — login/cadastro com senha ativam a sessão
+    // direto nesta página (sem o redirect server-side que o magic link e o OAuth do Google têm
+    // via /auth/callback), então precisa redirecionar assim que o auth state mudar, não só uma
+    // vez na hidratação inicial.
+    if (!isHydrated || !state.isAuthenticated) return
+    const recent = getMostRecentCareer()
+    router.replace(recent ? `/careers/${recent.slug}` : '/onboarding')
   }, [isHydrated, state.isAuthenticated, router, getMostRecentCareer])
 
   return (

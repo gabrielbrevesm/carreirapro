@@ -124,6 +124,9 @@ type MockDataContextValue = {
   isHydrated: boolean
 
   sendMagicLink: (email: string) => Promise<{ ok: boolean; error?: string }>
+  signUpWithPassword: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
+  signInWithPassword: (email: string, password: string) => Promise<{ ok: boolean; error?: string }>
+  signInWithGoogle: () => Promise<{ ok: boolean; error?: string }>
   logout: () => Promise<void>
 
   createCareerAndFirstArticle: (input: NewCareerInput) => Promise<{ career: Career; article: Article }>
@@ -235,6 +238,35 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     },
     [supabase]
   )
+
+  // Cadastro com e-mail e senha — confirmação de e-mail desativada no projeto (ver Supabase
+  // Auth settings), então a sessão já vem ativa na resposta do signUp, sem depender de e-mail.
+  const signUpWithPassword = useCallback(
+    async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+      const { error } = await supabase.auth.signUp({ email, password })
+      if (error) return { ok: false, error: error.message }
+      return { ok: true }
+    },
+    [supabase]
+  )
+
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<{ ok: boolean; error?: string }> => {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) return { ok: false, error: error.message }
+      return { ok: true }
+    },
+    [supabase]
+  )
+
+  const signInWithGoogle = useCallback(async (): Promise<{ ok: boolean; error?: string }> => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
+    })
+    if (error) return { ok: false, error: error.message }
+    return { ok: true }
+  }, [supabase])
 
   const logout = useCallback(async () => {
     await supabase.auth.signOut()
@@ -852,6 +884,9 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     state,
     isHydrated,
     sendMagicLink,
+    signUpWithPassword,
+    signInWithPassword,
+    signInWithGoogle,
     logout,
     createCareerAndFirstArticle,
     getCareerBySlug,
