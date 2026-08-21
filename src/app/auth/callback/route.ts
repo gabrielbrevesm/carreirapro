@@ -9,14 +9,25 @@ export async function GET(req: NextRequest) {
 
   if (code) {
     const supabase = await createClient()
-    // Diagnóstico: loga os nomes (não valores) dos cookies de sessão do Supabase presentes
-    // nesta request — ajuda a identificar se o cookie do PKCE code_verifier está ausente,
-    // duplicado ou fragmentado (causa comum de falha silenciosa/corrompida na troca do código).
-    const cookieNames = (await (await import('next/headers')).cookies())
-      .getAll()
-      .map((c) => c.name)
-      .filter((n) => n.startsWith('sb-'))
-    console.error('[/auth/callback] cookies sb- presentes:', cookieNames)
+    // Diagnóstico: sem logar o conteúdo (sensível), verifica se algum cookie tem caractere
+    // fora do range Latin-1 (>255) — é exatamente o que o erro "Cannot convert argument to a
+    // ByteString" indica, e cookies são o único dado desta request que não vem de env var.
+    const allCookies = (await (await import('next/headers')).cookies()).getAll()
+    for (const c of allCookies) {
+      for (let i = 0; i < c.value.length; i++) {
+        const code = c.value.charCodeAt(i)
+        if (code > 255) {
+          console.error(
+            `[/auth/callback] cookie "${c.name}" (len ${c.value.length}) tem char inválido no índice ${i}: code ${code}`
+          )
+          break
+        }
+      }
+    }
+    console.error(
+      '[/auth/callback] cookies presentes:',
+      allCookies.map((c) => `${c.name}(${c.value.length})`)
+    )
 
     try {
       const { error } = await supabase.auth.exchangeCodeForSession(code)
