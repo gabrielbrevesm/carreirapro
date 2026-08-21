@@ -260,6 +260,18 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
   )
 
   const signInWithGoogle = useCallback(async (): Promise<{ ok: boolean; error?: string }> => {
+    // Cada tentativa de OAuth (mesmo abandonada, ex: usuário fecha o popup do Google e tenta de
+    // novo) cria um novo cookie "sb-...-code-verifier" sem limpar os anteriores. Acumulados,
+    // eles inflam o header Cookie o suficiente pra corromper a troca do código na volta (erro
+    // "Cannot convert argument to a ByteString..." no /auth/callback). Limpa antes de cada
+    // tentativa nova pra nunca deixar mais de um pendente.
+    document.cookie.split(';').forEach((c) => {
+      const name = c.split('=')[0]?.trim()
+      if (name?.startsWith('sb-') && name.includes('code-verifier')) {
+        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+      }
+    })
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: { redirectTo: `${window.location.origin}/auth/callback` },
