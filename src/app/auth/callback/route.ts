@@ -8,6 +8,25 @@ export async function GET(req: NextRequest) {
   const next = req.nextUrl.searchParams.get('next') ?? '/'
 
   if (code) {
+    // Diagnóstico: confere se alguma env var usada pelo cliente do Supabase tem caractere fora
+    // do range Latin-1 (>255) — só o resultado (nome + índice + code point), nunca o valor.
+    for (const varName of ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY']) {
+      const val = process.env[varName] ?? ''
+      for (let i = 0; i < val.length; i++) {
+        const cc = val.charCodeAt(i)
+        if (cc > 255) {
+          console.error(`[/auth/callback] env "${varName}" (len ${val.length}) tem char inválido no índice ${i}: code ${cc}`)
+          break
+        }
+      }
+    }
+    console.error(
+      '[/auth/callback] env lengths:',
+      ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'].map(
+        (n) => `${n}=${(process.env[n] ?? '').length}`
+      )
+    )
+
     const supabase = await createClient()
     // Diagnóstico: sem logar o conteúdo (sensível), verifica se algum cookie tem caractere
     // fora do range Latin-1 (>255) — é exatamente o que o erro "Cannot convert argument to a
