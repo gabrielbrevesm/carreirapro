@@ -1,11 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
 import { useMockData } from '@/lib/mock/store'
 import { Loader2, MailCheck } from 'lucide-react'
 import { GoogleIcon } from '@/components/shared/GoogleIcon'
@@ -204,16 +206,36 @@ function MagicLinkLogin({ onBack }: { onBack: () => void }) {
   )
 }
 
-export default function LoginPage() {
+function LoginContent() {
   const [mode, setMode] = useState<'password' | 'magic-link'>('password')
+  const searchParams = useSearchParams()
+  const authError = searchParams.get('error')
+  const reason = searchParams.get('reason')
 
   return (
-    <Card>
-      {mode === 'password' ? (
-        <PasswordLogin onUseMagicLink={() => setMode('magic-link')} />
-      ) : (
-        <MagicLinkLogin onBack={() => setMode('password')} />
+    <div className="space-y-4">
+      {authError && (
+        <Alert variant="destructive">
+          <AlertDescription>
+            Não foi possível concluir o login{reason ? `: ${reason}` : ''}. Tente de novo.
+          </AlertDescription>
+        </Alert>
       )}
-    </Card>
+      <Card>
+        {mode === 'password' ? (
+          <PasswordLogin onUseMagicLink={() => setMode('magic-link')} />
+        ) : (
+          <MagicLinkLogin onBack={() => setMode('password')} />
+        )}
+      </Card>
+    </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }
