@@ -13,7 +13,11 @@ export async function GET(req: NextRequest) {
     if (!error) {
       return NextResponse.redirect(new URL(next, req.nextUrl.origin))
     }
+    console.error('[/auth/callback] exchangeCodeForSession falhou', error.message)
+    return NextResponse.redirect(
+      new URL(`/login?error=auth&reason=${encodeURIComponent(error.message)}`, req.nextUrl.origin)
+    )
   }
 
-  return NextResponse.redirect(new URL('/login?error=auth', req.nextUrl.origin))
+  return NextResponse.redirect(new URL('/login?error=auth&reason=missing_code', req.nextUrl.origin))
 }
