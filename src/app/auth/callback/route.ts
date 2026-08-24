@@ -26,6 +26,14 @@ export async function GET(req: NextRequest) {
         (n) => `${n}=${(process.env[n] ?? '').length}`
       )
     )
+    // Teste direto: será que o valor puro da env var já quebra um Headers() nativo, sem passar
+    // pelo supabase-js? Isola se a corrupção é real no valor ou um artefato de outra camada.
+    try {
+      new Headers({ apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '' })
+      console.error('[/auth/callback] Headers() com o anon key cru: OK, não lançou')
+    } catch (headerErr) {
+      console.error('[/auth/callback] Headers() com o anon key cru LANÇOU:', String(headerErr))
+    }
 
     const supabase = await createClient()
     // Diagnóstico: sem logar o conteúdo (sensível), verifica se algum cookie tem caractere
