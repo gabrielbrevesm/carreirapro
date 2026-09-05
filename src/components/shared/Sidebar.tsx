@@ -71,11 +71,31 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               type="button"
               className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-foreground/5"
             >
-              <Avatar className="h-8 w-8 shrink-0">
-                <AvatarFallback className="text-xs">{initials ?? <User className="w-3.5 h-3.5" />}</AvatarFallback>
+              <Avatar
+                className={cn(
+                  'h-8 w-8 shrink-0',
+                  state.plan === 'pro' && 'ring-2 ring-offset-2 ring-offset-background ring-amber-400'
+                )}
+              >
+                <AvatarFallback
+                  className={cn(
+                    'text-xs',
+                    state.plan === 'pro' && 'bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-600 text-amber-950 font-semibold'
+                  )}
+                >
+                  {initials ?? <User className="w-3.5 h-3.5" />}
+                </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium leading-tight">{state.profile?.fullName}</p>
+                <p
+                  className={cn(
+                    'truncate text-sm font-medium leading-tight',
+                    state.plan === 'pro' &&
+                      'bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent font-semibold'
+                  )}
+                >
+                  {state.profile?.fullName}
+                </p>
                 <p className="truncate text-xs text-muted-foreground leading-tight">{state.profile?.email}</p>
               </div>
               <ChevronsUpDown className="h-4 w-4 shrink-0 text-muted-foreground" />
@@ -86,7 +106,7 @@ export function SidebarNav({ onNavigate }: { onNavigate?: () => void }) {
               <div className="flex items-center justify-between gap-2">
                 <span>Plano atual</span>
                 {state.plan === 'pro' ? (
-                  <Badge className="gap-1">
+                  <Badge className="gap-1 border-0 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-amber-950">
                     <Sparkles className="w-3 h-3" /> Pro
                   </Badge>
                 ) : (

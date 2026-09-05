@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { useMockData } from '@/lib/mock/store'
 import { Paywall } from '@/components/shared/Paywall'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
@@ -9,9 +10,47 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { Progress } from '@/components/ui/progress'
-import { CheckCircle2, Sparkles } from 'lucide-react'
+import { CheckCircle2, Sparkles, Sun, Moon, Monitor } from 'lucide-react'
 import { FREE_LIMITS } from '@/lib/freemium'
 import { toast } from 'sonner'
+
+function AppearanceCard() {
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+
+  const options = [
+    { value: 'light', label: 'Claro', icon: Sun },
+    { value: 'dark', label: 'Escuro', icon: Moon },
+    { value: 'system', label: 'Sistema', icon: Monitor },
+  ] as const
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Aparência</CardTitle>
+        <CardDescription>Escolha como o CarreiraPRO deve ser exibido.</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-2">
+          {options.map(({ value, label, icon: Icon }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setTheme(value)}
+              className={`flex flex-col items-center gap-1.5 rounded-lg border px-3 py-3 text-sm font-medium transition-colors ${
+                mounted && theme === value ? 'border-primary bg-primary/5 text-foreground' : 'text-muted-foreground hover:bg-muted/60'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {label}
+            </button>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
 
 function SettingsContent() {
   const searchParams = useSearchParams()
@@ -94,12 +133,14 @@ function SettingsContent() {
         </CardContent>
       </Card>
 
+      <AppearanceCard />
+
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Assinatura</CardTitle>
             {state.plan === 'pro' ? (
-              <Badge className="gap-1">
+              <Badge className="gap-1 border-0 bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 text-amber-950">
                 <Sparkles className="w-3 h-3" /> Pro
               </Badge>
             ) : (

@@ -150,7 +150,7 @@ type MockDataContextValue = {
   getCharacterMessagesForCareer: (careerId: string) => CharacterMessage[]
   getCharacterThread: (careerId: string, characterId: CharacterId) => CharacterMessage[]
   getCharacterMessageById: (messageId: string) => CharacterMessage | undefined
-  markCharacterMessageRead: (messageId: string) => void
+  markCharacterMessageRead: (messageId: string) => Promise<void>
   replyToCharacterMessage: (messageId: string, userReply: string) => Promise<void>
   clearLatestCharacterNotification: () => void
 
@@ -218,7 +218,12 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
       setAuthChecked(true)
     }
 
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      // TOKEN_REFRESHED dispara periodicamente (e também quando a aba volta a ficar visível)
+      // sem trocar de usuário — refazer o fetch completo aqui sobrescreve o estado local com uma
+      // cópia potencialmente desatualizada do banco, apagando updates otimistas ainda em voo
+      // (ex: markCharacterMessageRead). Só refaz o sync em transições reais de sessão.
+      if (event === 'TOKEN_REFRESHED') return
       setDomainLoaded(false)
       syncFromSession(session?.user.id ?? null, session?.user.email)
     })
@@ -825,12 +830,16 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
   )
 
   const markCharacterMessageRead = useCallback(
-    (messageId: string) => {
+    async (messageId: string) => {
       setState((s) => ({
         ...s,
         characterMessages: s.characterMessages.map((m) => (m.id === messageId ? { ...m, read: true } : m)),
       }))
-      void supabase.from('character_messages').update({ read: true }).eq('id', messageId)
+      // Antes era fire-and-forget (void ...) — qualquer erro (sessão expirada, rede) ficava
+      // completamente silencioso, e a marcação de "lido" nunca chegava a persistir sem que
+      // ninguém percebesse. Agora aguarda e loga falhas.
+      const { error } = await supabase.from('character_messages').update({ read: true }).eq('id', messageId)
+      if (error) console.error('[markCharacterMessageRead] falha ao persistir leitura', error)
     },
     [supabase]
   )
