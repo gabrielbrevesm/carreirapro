@@ -36,6 +36,11 @@ export type AiSpeechResult = {
   audioUrl: string
 }
 
+export type AiBoleiroInsightsResult = {
+  tips: string[]
+  newCareerSuggestions: string[]
+}
+
 // Sinaliza que o SERVIDOR recusou por cota esgotada (verificação real no banco, não a
 // pré-checagem local que já roda antes desta chamada) — isso NUNCA deve cair no fallback mock,
 // senão um usuário sem cota continuaria gerando conteúdo "grátis" indefinidamente.
@@ -110,6 +115,31 @@ export async function tryGenerateSpeechWithAI(params: { article: Article }): Pro
 
     const data = (await res.json()) as AiSpeechResult
     if (!data.audioUrl) return null
+
+    return data
+  } catch {
+    return null
+  }
+}
+
+// Gera as dicas do "Dica de Boleiro" no dashboard. Retorna null em qualquer falha — o
+// componente simplesmente esconde o painel nesse caso, sem fallback mock (não faz sentido
+// inventar dicas genéricas sem IA real).
+export async function tryGenerateBoleiroInsights(params: {
+  careers: Career[]
+  memories: Record<string, CareerMemory>
+  articles: Article[]
+}): Promise<AiBoleiroInsightsResult | null> {
+  try {
+    const res = await fetch('/api/insights/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    })
+    if (!res.ok) return null
+
+    const data = (await res.json()) as AiBoleiroInsightsResult
+    if (!Array.isArray(data.tips) || data.tips.length === 0) return null
 
     return data
   } catch {

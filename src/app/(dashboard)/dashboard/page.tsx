@@ -5,6 +5,7 @@ import { useMockData } from '@/lib/mock/store'
 import { CareerCard } from '@/components/career/CareerCard'
 import { NewCareerButton } from '@/components/career/NewCareerButton'
 import { EmptyState } from '@/components/shared/EmptyState'
+import { BoleiroInsights } from '@/components/dashboard/BoleiroInsights'
 import { Card, CardContent } from '@/components/ui/card'
 import { Trophy, Newspaper, Sparkles } from 'lucide-react'
 
@@ -60,6 +61,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      <BoleiroInsights />
 
       <div className="space-y-3">
         <div className="flex items-center justify-between">
