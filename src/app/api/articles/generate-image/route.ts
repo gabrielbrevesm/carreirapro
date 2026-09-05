@@ -15,6 +15,19 @@ function extFromPath(url: string): 'png' | 'jpeg' {
   return /\.jpe?g$/i.test(url) ? 'jpeg' : 'png'
 }
 
+// A referência facial do técnico só deve ser usada quando ELE é quem aparece na foto — usar a
+// foto dele em uma imagem sobre outro personagem (ex: um jogador) produz a pessoa errada na
+// cena. O Brief Editorial já lista quem aparece em "## PERSONAGENS NA FOTO"; checamos se o nome
+// do técnico aparece nessa seção específica (não na matéria inteira).
+function briefFeaturesManager(brief: string, managerName: string): boolean {
+  const match = brief.match(/##\s*PERSONAGENS NA FOTO([\s\S]*?)(?:\n---|\n##\s|$)/i)
+  const section = match?.[1] ?? ''
+  if (!section) return false
+  const lastName = managerName.trim().split(/\s+/).pop() ?? managerName
+  const needle = lastName.toLowerCase()
+  return section.toLowerCase().includes(needle)
+}
+
 // A foto de referência do técnico vem do Supabase Storage (URL remota, http/https) desde a
 // migração de storage — mas pode ser um caminho local antigo (/uploads/...) em registros
 // anteriores a essa migração. Cobre os dois casos.
@@ -129,12 +142,19 @@ export async function POST(req: NextRequest) {
     const imagePrompt = artCompletion.choices[0]?.message?.content
     if (!imagePrompt) throw new Error('Prompt de imagem vazio')
 
+    // Só usa a foto de referência do técnico quando ele é de fato quem aparece nesta imagem
+    // específica — caso contrário ela acaba colocando o rosto/corpo dele em cena errada.
+    const managerPhotoForThisImage =
+      body.career.managerPhotoUrl && briefFeaturesManager(brief, body.career.managerName)
+        ? body.career.managerPhotoUrl
+        : null
+
     // Motor de renderização: Gemini primeiro (bem melhor pra preservar a semelhança facial de uma
     // pessoa real a partir da foto de referência do técnico), com fallback pro gpt-image-1.
-    let b64: string | null = await tryGenerateWithGemini(body.career.managerPhotoUrl, imagePrompt.slice(0, 4000))
+    let b64: string | null = await tryGenerateWithGemini(managerPhotoForThisImage, imagePrompt.slice(0, 4000))
 
-    if (!b64 && body.career.managerPhotoUrl) {
-      b64 = await tryEditWithManagerPhoto(client, body.career.managerPhotoUrl, imagePrompt.slice(0, 32000))
+    if (!b64 && managerPhotoForThisImage) {
+      b64 = await tryEditWithManagerPhoto(client, managerPhotoForThisImage, imagePrompt.slice(0, 32000))
     }
 
     if (!b64) {
