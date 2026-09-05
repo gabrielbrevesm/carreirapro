@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
-import { toFile } from 'openai'
 import { getOpenAIClient, getConfiguredModel } from '@/lib/ai/openai-client'
+import { generateImageWithGemini, isGeminiConfigured } from '@/lib/ai/gemini-client'
 import { BRIEF_EDITORIAL_SYSTEM_PROMPT, buildBriefEditorialUserMessage } from '@/lib/ai/image-brief-prompt'
 import { ART_DIRECTOR_SYSTEM_PROMPT, buildArtDirectorUserMessage } from '@/lib/ai/art-director-prompt'
 import { saveDataUrlToStorage } from '@/lib/storage/local-storage'
@@ -11,16 +11,37 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { checkAndReserveQuota } from '@/lib/supabase/quota'
 import type { Article, Career } from '@/types'
 
-// Tenta usar a foto de referência do técnico (quando existe) para manter a consistência
-// visual dele nas imagens geradas ao longo da carreira. Roda em quality 'high' — mais lento
-// que o generate() padrão, mas é justamente onde a fidelidade/realismo do rosto mais importa.
-// Retorna null em qualquer falha (arquivo ausente, edit indisponível) para cair no generate() padrão.
+function extFromPath(url: string): 'png' | 'jpeg' {
+  return /\.jpe?g$/i.test(url) ? 'jpeg' : 'png'
+}
+
+// Gera a imagem via Gemini, usando a foto de referência do técnico (quando existe) para manter
+// a semelhança facial dele nas imagens geradas ao longo da carreira. Retorna null em qualquer
+// falha para o chamador cair no motor de fallback (gpt-image-1).
+async function tryGenerateWithGemini(managerPhotoUrl: string | null | undefined, prompt: string): Promise<string | null> {
+  if (!isGeminiConfigured()) return null
+  try {
+    let referenceImages: { mimeType: string; data: string }[] | undefined
+    if (managerPhotoUrl) {
+      const filePath = path.join(process.cwd(), 'public', managerPhotoUrl.replace(/^\//, ''))
+      const buffer = await readFile(filePath)
+      referenceImages = [{ mimeType: `image/${extFromPath(managerPhotoUrl)}`, data: buffer.toString('base64') }]
+    }
+    return await generateImageWithGemini({ prompt, referenceImages })
+  } catch (error) {
+    console.error('[/api/articles/generate-image] Gemini falhou, usando gpt-image-1 como fallback', error)
+    return null
+  }
+}
+
+// Fallback: OpenAI gpt-image-1 (usado só se o Gemini não estiver configurado ou falhar).
 async function tryEditWithManagerPhoto(
   client: NonNullable<ReturnType<typeof getOpenAIClient>>,
   managerPhotoUrl: string,
   prompt: string
 ): Promise<string | null> {
   try {
+    const { toFile } = await import('openai')
     const filePath = path.join(process.cwd(), 'public', managerPhotoUrl.replace(/^\//, ''))
     const buffer = await readFile(filePath)
     const image = await toFile(buffer, 'manager-reference.png', { type: 'image/png' })
@@ -44,7 +65,8 @@ async function tryEditWithManagerPhoto(
 export async function POST(req: NextRequest) {
   const client = getOpenAIClient()
   if (!client) {
-    // Sem chave configurada — sinaliza ao cliente para usar a imagem mock local.
+    // Sem chave da OpenAI — o Brief Editorial e o Diretor de Arte (motores 2 e 3) dependem dela
+    // mesmo quando o Gemini está configurado para a etapa final de renderização da imagem.
     return NextResponse.json({ error: 'AI_NOT_CONFIGURED' }, { status: 503 })
   }
 
@@ -96,11 +118,11 @@ export async function POST(req: NextRequest) {
     const imagePrompt = artCompletion.choices[0]?.message?.content
     if (!imagePrompt) throw new Error('Prompt de imagem vazio')
 
-    // Técnico com foto de referência cadastrada (upload, se fictício, ou Wikipédia, se real):
-    // tenta editar a partir dela para manter a mesma aparência em todas as imagens da carreira.
-    // Qualquer falha cai no generate() padrão.
-    let b64: string | null = null
-    if (body.career.managerPhotoUrl) {
+    // Motor de renderização: Gemini primeiro (bem melhor pra preservar a semelhança facial de uma
+    // pessoa real a partir da foto de referência do técnico), com fallback pro gpt-image-1.
+    let b64: string | null = await tryGenerateWithGemini(body.career.managerPhotoUrl, imagePrompt.slice(0, 4000))
+
+    if (!b64 && body.career.managerPhotoUrl) {
       b64 = await tryEditWithManagerPhoto(client, body.career.managerPhotoUrl, imagePrompt.slice(0, 32000))
     }
 
