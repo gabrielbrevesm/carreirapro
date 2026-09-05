@@ -15,6 +15,19 @@ function extFromPath(url: string): 'png' | 'jpeg' {
   return /\.jpe?g$/i.test(url) ? 'jpeg' : 'png'
 }
 
+// A foto de referência do técnico vem do Supabase Storage (URL remota, http/https) desde a
+// migração de storage — mas pode ser um caminho local antigo (/uploads/...) em registros
+// anteriores a essa migração. Cobre os dois casos.
+async function loadImageBuffer(url: string): Promise<Buffer> {
+  if (/^https?:\/\//i.test(url)) {
+    const res = await fetch(url)
+    if (!res.ok) throw new Error(`Falha ao baixar imagem de referência (${res.status}): ${url}`)
+    return Buffer.from(await res.arrayBuffer())
+  }
+  const filePath = path.join(process.cwd(), 'public', url.replace(/^\//, ''))
+  return readFile(filePath)
+}
+
 // Gera a imagem via Gemini, usando a foto de referência do técnico (quando existe) para manter
 // a semelhança facial dele nas imagens geradas ao longo da carreira. Retorna null em qualquer
 // falha para o chamador cair no motor de fallback (gpt-image-1).
@@ -23,8 +36,7 @@ async function tryGenerateWithGemini(managerPhotoUrl: string | null | undefined,
   try {
     let referenceImages: { mimeType: string; data: string }[] | undefined
     if (managerPhotoUrl) {
-      const filePath = path.join(process.cwd(), 'public', managerPhotoUrl.replace(/^\//, ''))
-      const buffer = await readFile(filePath)
+      const buffer = await loadImageBuffer(managerPhotoUrl)
       referenceImages = [{ mimeType: `image/${extFromPath(managerPhotoUrl)}`, data: buffer.toString('base64') }]
     }
     return await generateImageWithGemini({ prompt, referenceImages })
@@ -42,8 +54,7 @@ async function tryEditWithManagerPhoto(
 ): Promise<string | null> {
   try {
     const { toFile } = await import('openai')
-    const filePath = path.join(process.cwd(), 'public', managerPhotoUrl.replace(/^\//, ''))
-    const buffer = await readFile(filePath)
+    const buffer = await loadImageBuffer(managerPhotoUrl)
     const image = await toFile(buffer, 'manager-reference.png', { type: 'image/png' })
 
     const editResponse = await client.images.edit({
