@@ -41,48 +41,36 @@ const TICKER_ITEMS = [
 const FEATURES = [
   {
     icon: Newspaper,
-    tag: 'GRÁTIS · 1ª MATÉRIA',
-    tagColor: 'text-[#1E8F5E] border-[#1E8F5E]/30 bg-[#1E8F5E]/10',
     title: 'Matérias geradas por IA',
     body: 'Registre um resultado, uma contratação ou uma demissão polêmica e a redação transforma isso em matéria, no estilo dos grandes veículos esportivos.',
     rotate: '-rotate-1',
   },
   {
     icon: Camera,
-    tag: 'GRÁTIS · 1ª IMAGEM',
-    tagColor: 'text-[#1E8F5E] border-[#1E8F5E]/30 bg-[#1E8F5E]/10',
     title: 'Imagens editoriais',
     body: 'Cada matéria pode vir com uma capa gerada por IA — do gramado à coletiva de imprensa, no estilo de um grande jornal esportivo.',
     rotate: 'rotate-1',
   },
   {
     icon: Clock,
-    tag: 'INCLUÍDO NO FREE',
-    tagColor: 'text-foreground/70 border-foreground/20 bg-foreground/5',
     title: 'Timeline da carreira',
     body: 'Toda contratação, toda saída, toda decisão fica registrada numa linha do tempo — a história completa da sua passagem pelo clube.',
     rotate: 'rotate-1',
   },
   {
     icon: Shield,
-    tag: 'PRO',
-    tagColor: 'text-[#E23B32] border-[#E23B32]/30 bg-[#E23B32]/10',
     title: 'Análise de elenco',
     body: 'A IA lê o seu elenco e aponta pontos fortes, fragilidades e ajustes táticos — como um analista de desempenho de verdade.',
     rotate: '-rotate-1',
   },
   {
     icon: Users,
-    tag: 'PRO',
-    tagColor: 'text-[#E23B32] border-[#E23B32]/30 bg-[#E23B32]/10',
     title: 'Sugestões de contratação',
     body: 'Depois de 5 eventos registrados, a IA aprende o seu estilo de jogo e sugere reforços sob medida para o seu sistema tático.',
     rotate: 'rotate-1',
   },
   {
     icon: TrendingUp,
-    tag: 'FREE: HOJE · PRO: 30 DIAS',
-    tagColor: 'text-[#F0B429] border-[#F0B429]/40 bg-[#F0B429]/10',
     title: 'Feed de mercado real',
     body: 'As transferências do futebol de verdade, sincronizadas todo dia — pra você especular contratações com contexto real.',
     rotate: '-rotate-1',
@@ -108,23 +96,21 @@ const STEPS = [
   {
     n: '04',
     title: 'Vire Pro quando quiser',
-    body: 'Matérias ilimitadas, análise de elenco e sugestões sob medida.',
+    body: 'Mais carreiras em paralelo, análise de elenco e sugestões de contratação sob medida.',
   },
 ]
 
 const FREE_ITEMS = [
-  'Contas e carreiras ilimitadas',
-  'Questionário de história do técnico',
-  '1 matéria gerada por IA (vitalícia)',
-  '1 imagem editorial (vitalícia)',
+  '1ª carreira ilimitada, gere quantas matérias quiser',
+  'Questionário de história do técnico do seu save',
+  'Imagens editoriais em todas as matérias da sua primeira carreira',
   'Timeline completa da carreira',
-  'Feed de mercado do dia',
+  'Contatos: receba mensagens do presidente do clube, do diretor esportivo e departamento médico',
 ]
 
 const PRO_ITEMS = [
-  'Tudo do plano Free',
-  'Matérias ilimitadas',
-  'Imagens editoriais ilimitadas',
+  'Crie quantas carreiras quiser, ainda mais liberdade',
+  'Tudo do plano Free em cada uma delas',
   'Análise de elenco por IA',
   'Sugestões de contratação por estilo de jogo',
   'Feed de mercado dos últimos 30 dias',
@@ -145,8 +131,8 @@ const FAQ = [
     a: 'Sim. É uma assinatura mensal, sem fidelidade. Cancele quando quiser direto nas configurações da sua conta.',
   },
   {
-    q: 'E se eu já usei minha matéria e imagem grátis?',
-    a: 'Sua carreira, timeline e feed do dia continuam disponíveis normalmente. Pra gerar novas matérias e imagens, é só assinar o Pro.',
+    q: 'E se eu quiser jogar mais de uma carreira ao mesmo tempo?',
+    a: 'Sua primeira carreira é gratuita para sempre, com matérias e imagens ilimitadas. Pra criar uma segunda carreira em paralelo, é só assinar o Pro.',
   },
 ]
 
@@ -209,12 +195,12 @@ export function LandingPage() {
           <div className="mx-auto grid max-w-6xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>
               <p className="[font-family:var(--font-geist-mono)] text-xs font-medium tracking-[0.2em] text-[#1E8F5E] uppercase">
-                CarreiraPRO · sua carreira virtual vira manchete
+                SEU MODO CARREIRA NO EA FC AGORA COM HISTÓRIA VIVA
               </p>
               <h1
                 className={`${displayFont} mt-4 text-[3rem] leading-[0.95] tracking-wide sm:text-[4rem] lg:text-[4.5rem]`}
               >
-                A REDAÇÃO QUE COBRE A SUA CARREIRA NO EA FC.
+                JOGUE O MODO CARREIRA SEM ENJOAR
               </h1>
               <p className="mt-6 max-w-lg text-lg text-[#12151A]/75">
                 Envie os resultados, contratações e decisões da sua temporada e receba
@@ -242,7 +228,7 @@ export function LandingPage() {
                 </Button>
               </div>
               <p className="mt-4 [font-family:var(--font-geist-mono)] text-xs tracking-wide text-[#12151A]/50 uppercase">
-                Grátis pra sempre no plano básico · sem cartão pra começar
+                PRIMEIRA CARREIRA 100% GRATUITA - SEM CARTÃO PARA COMEÇAR
               </p>
             </div>
 
@@ -310,16 +296,9 @@ export function LandingPage() {
                   key={f.title}
                   className={`${f.rotate} rounded-sm bg-white p-6 shadow-md ring-1 ring-[#12151A]/10 transition-transform duration-300 hover:rotate-0 hover:shadow-lg`}
                 >
-                  <div className="flex items-center justify-between">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#12151A]/5">
-                      <f.icon className="h-4.5 w-4.5" />
-                    </span>
-                    <span
-                      className={`rounded-full border px-2 py-0.5 [font-family:var(--font-geist-mono)] text-[0.6rem] font-medium tracking-widest uppercase ${f.tagColor}`}
-                    >
-                      {f.tag}
-                    </span>
-                  </div>
+                  <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[#12151A]/5">
+                    <f.icon className="h-4.5 w-4.5" />
+                  </span>
                   <h3 className="mt-4 text-lg font-semibold">{f.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[#12151A]/70">{f.body}</p>
                 </div>

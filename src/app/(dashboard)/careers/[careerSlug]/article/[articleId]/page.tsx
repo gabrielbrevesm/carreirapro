@@ -8,7 +8,6 @@ import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { ArticleRenderer } from '@/components/article/ArticleRenderer'
 import { ArticleShareButton } from '@/components/article/ArticleShareButton'
-import { ArticlePlayerButton } from '@/components/article/ArticlePlayerButton'
 import { Button } from '@/components/ui/button'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import { ArrowLeft, Newspaper, Sparkles } from 'lucide-react'
@@ -57,10 +56,7 @@ export default function ArticlePage({ params }: { params: Promise<{ careerSlug: 
             <ArrowLeft className="w-4 h-4 mr-2" /> Voltar à carreira
           </Link>
         </Button>
-        <div className="flex items-center gap-2">
-          <ArticleShareButton shareToken={article.shareToken} />
-          <ArticlePlayerButton article={article} />
-        </div>
+        <ArticleShareButton shareToken={article.shareToken} />
       </div>
 
       {imageBlocked && (

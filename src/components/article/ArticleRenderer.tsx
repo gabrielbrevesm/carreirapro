@@ -7,6 +7,7 @@ import { parseFreeformArticle, type FreeformBlock } from '@/lib/ai/parse-freefor
 import { OutletBadge } from '@/components/article/OutletBadge'
 import { PlayerAvatar } from '@/components/shared/PlayerAvatar'
 import { EditorialPhoto } from '@/components/article/EditorialPhoto'
+import { ArticlePlayerButton } from '@/components/article/ArticlePlayerButton'
 
 const OUTCOME_STYLES = {
   win: 'text-green-700 dark:text-green-400',
@@ -39,6 +40,8 @@ export function ArticleRenderer({ article }: { article: Article }) {
         {outletLabel && <OutletBadge label={outletLabel} className="text-sm px-2.5 py-1" />}
         <h1 className="text-2xl md:text-4xl font-bold leading-tight tracking-tight">{article.headline}</h1>
         {article.subheadline && <p className="text-lg text-muted-foreground">{article.subheadline}</p>}
+
+        <ArticlePlayerButton article={article} />
 
         <div className="flex items-center gap-2 text-xs text-muted-foreground flex-wrap">
           <span>{new Date(article.createdAt).toLocaleDateString('pt-BR', { dateStyle: 'long' })}</span>
