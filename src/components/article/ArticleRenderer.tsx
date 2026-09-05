@@ -6,6 +6,8 @@ import { MessageCircle, Camera, ThumbsUp, Repeat2 } from 'lucide-react'
 import { parseFreeformArticle, type FreeformBlock } from '@/lib/ai/parse-freeform-article'
 import { OutletBadge } from '@/components/article/OutletBadge'
 import { PlayerAvatar } from '@/components/shared/PlayerAvatar'
+import { PunditAvatar } from '@/components/shared/PunditAvatar'
+import { ClubBadge } from '@/components/shared/ClubBadge'
 import { EditorialPhoto } from '@/components/article/EditorialPhoto'
 import { ArticlePlayerButton } from '@/components/article/ArticlePlayerButton'
 
@@ -98,7 +100,10 @@ function FreeformSections({ blocks }: { blocks: FreeformBlock[] }) {
               <div className="grid gap-3">
                 {block.entries.map((entry, ei) => (
                   <div key={ei} className="border rounded-lg p-4 space-y-1.5">
-                    <span className="font-semibold text-sm">{entry.name}</span>
+                    <div className="flex items-center gap-2.5">
+                      <PunditAvatar name={entry.name} className="w-8 h-8" />
+                      <span className="font-semibold text-sm">{entry.name}</span>
+                    </div>
                     {entry.quotes.map((q, qi) => (
                       <p key={qi} className="text-sm italic border-l-2 pl-3 text-muted-foreground">
                         &ldquo;{q}&rdquo;
@@ -210,8 +215,9 @@ function StructuredSections({ sections }: { sections: NonNullable<Article['secti
           <h2 className="font-semibold text-sm uppercase tracking-wider text-muted-foreground">Próximos jogos</h2>
           <div className="space-y-3">
             {sections.upcomingFixtures.map((fixture, i) => (
-              <div key={i} className="flex gap-3">
-                <span className={`w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 ${DOT_COLORS[fixture.dot]}`} />
+              <div key={i} className="flex items-center gap-3">
+                <span className={`w-2.5 h-2.5 rounded-full shrink-0 ${DOT_COLORS[fixture.dot]}`} />
+                <ClubBadge name={fixture.opponent} className="w-8 h-8" />
                 <div>
                   <p className="font-semibold text-sm">{fixture.opponent}</p>
                   <p className="text-sm text-muted-foreground">{fixture.note}</p>
@@ -229,7 +235,10 @@ function StructuredSections({ sections }: { sections: NonNullable<Article['secti
             {sections.pressDebate.map((block, i) => (
               <div key={i} className="border rounded-lg p-4 space-y-1.5">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-semibold text-sm">{block.name}</span>
+                  <div className="flex items-center gap-2.5">
+                    <PunditAvatar name={block.name} className="w-8 h-8" />
+                    <span className="font-semibold text-sm">{block.name}</span>
+                  </div>
                   {block.outlet && <OutletBadge label={block.outlet} className="text-[10px] px-1.5 py-0.5" />}
                 </div>
                 {block.quotes.map((q, qi) => (

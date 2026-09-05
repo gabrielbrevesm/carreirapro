@@ -11,11 +11,13 @@ import {
   DropdownMenuLabel,
 } from '@/components/ui/dropdown-menu'
 import { useMockData } from '@/lib/mock/store'
+import { cn } from '@/lib/utils'
 
 export function CareerSwitcher({ onNavigate }: { onNavigate?: () => void }) {
   const router = useRouter()
   const pathname = usePathname()
   const { state, getCareerBySlug } = useMockData()
+  const isPro = state.plan === 'pro'
 
   const activeSlug = pathname.match(/^\/careers\/([^/]+)/)?.[1]
   const activeCareer = activeSlug ? getCareerBySlug(activeSlug) : undefined
@@ -32,11 +34,21 @@ export function CareerSwitcher({ onNavigate }: { onNavigate?: () => void }) {
           type="button"
           className="flex w-full items-center gap-2.5 rounded-lg px-2 py-2 text-left hover:bg-foreground/5"
         >
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div
+            className={cn(
+              'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg',
+              isPro ? 'bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-600 text-amber-950' : 'bg-primary text-primary-foreground'
+            )}
+          >
             <Trophy className="h-4 w-4" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold leading-tight">
+            <p
+              className={cn(
+                'truncate text-sm font-semibold leading-tight',
+                isPro && 'bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent'
+              )}
+            >
               {activeCareer ? activeCareer.managerName : 'CarreiraPRO'}
             </p>
             <p className="truncate text-xs text-muted-foreground leading-tight">

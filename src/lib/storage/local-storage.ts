@@ -5,7 +5,7 @@ import { randomId } from '@/lib/utils'
 // Storage próprio do app: arquivos ficam no bucket público "uploads" do Supabase Storage.
 // Substitui o antigo storage em disco (public/uploads) — necessário porque a maioria dos
 // hosts de produção (incluindo a Vercel) não tem disco persistente entre deploys/requests.
-export type UploadCategory = 'images' | 'managers' | 'players' | 'audio'
+export type UploadCategory = 'images' | 'managers' | 'players' | 'audio' | 'clubs'
 
 const BUCKET = 'uploads'
 
@@ -14,6 +14,7 @@ function extFromMime(mime: string): string {
   if (mime === 'image/jpeg' || mime === 'image/jpg') return 'jpg'
   if (mime === 'image/webp') return 'webp'
   if (mime === 'audio/mpeg') return 'mp3'
+  if (mime === 'image/svg+xml') return 'svg'
   return 'bin'
 }
 

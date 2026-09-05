@@ -6,6 +6,7 @@ import { CareerCard } from '@/components/career/CareerCard'
 import { NewCareerButton } from '@/components/career/NewCareerButton'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { BoleiroInsights } from '@/components/dashboard/BoleiroInsights'
+import { cn } from '@/lib/utils'
 import { Card, CardContent } from '@/components/ui/card'
 import { Trophy, Newspaper, Sparkles } from 'lucide-react'
 
@@ -51,11 +52,23 @@ export default function DashboardPage() {
         </Card>
         <Card>
           <CardContent className="pt-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
+            <div
+              className={cn(
+                'w-10 h-10 rounded-full flex items-center justify-center',
+                plan === 'pro' ? 'bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-600' : 'bg-primary/10'
+              )}
+            >
+              <Sparkles className={cn('w-5 h-5', plan === 'pro' ? 'text-amber-950' : 'text-primary')} />
             </div>
             <div>
-              <p className="text-2xl font-bold leading-none capitalize">{plan === 'pro' ? 'Pro' : 'Gratuito'}</p>
+              <p
+                className={cn(
+                  'text-2xl font-bold leading-none capitalize',
+                  plan === 'pro' && 'bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent'
+                )}
+              >
+                {plan === 'pro' ? 'Pro' : 'Gratuito'}
+              </p>
               <p className="text-xs text-muted-foreground mt-1">Plano atual</p>
             </div>
           </CardContent>
