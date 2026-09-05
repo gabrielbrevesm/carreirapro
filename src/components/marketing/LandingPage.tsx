@@ -13,6 +13,8 @@ import {
   Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ArticleShowcase } from '@/components/marketing/ArticleShowcase'
+import { ContactsShowcase } from '@/components/marketing/ContactsShowcase'
 
 const display = Bebas_Neue({
   subsets: ['latin'],
@@ -166,6 +168,9 @@ export function LandingPage() {
             <a href="#como-funciona" className="transition-colors hover:text-[#12151A]">
               Como funciona
             </a>
+            <a href="#exemplos" className="transition-colors hover:text-[#12151A]">
+              Exemplos
+            </a>
             <a href="#planos" className="transition-colors hover:text-[#12151A]">
               Planos
             </a>
@@ -307,6 +312,23 @@ export function LandingPage() {
           </div>
         </section>
 
+        {/* Contatos */}
+        <section id="contatos" className="bg-white px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <div className="max-w-2xl">
+              <p className="[font-family:var(--font-geist-mono)] text-xs font-medium tracking-[0.2em] text-[#1E8F5E] uppercase">
+                A diretoria também fala com você
+              </p>
+              <h2 className={`${displayFont} mt-3 text-4xl tracking-wide sm:text-5xl`}>SUA CAIXA DE ENTRADA GANHA VIDA</h2>
+              <p className="mt-4 text-[#12151A]/70">
+                Presidente, diretor esportivo e departamento médico mandam mensagem direto pra você — como colegas de
+                trabalho, não comunicados oficiais. É a bastidor da sua carreira, não só a manchete.
+              </p>
+            </div>
+            <ContactsShowcase />
+          </div>
+        </section>
+
         {/* Como funciona */}
         <section id="como-funciona" className="bg-white px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-6xl">
@@ -337,6 +359,13 @@ export function LandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Exemplos de matérias */}
+        <section id="exemplos" className="px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <ArticleShowcase />
           </div>
         </section>
 
