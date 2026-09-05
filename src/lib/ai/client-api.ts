@@ -32,6 +32,10 @@ export type AiImageResult = {
   generationTimeMs: number
 }
 
+export type AiSpeechResult = {
+  audioUrl: string
+}
+
 // Sinaliza que o SERVIDOR recusou por cota esgotada (verificação real no banco, não a
 // pré-checagem local que já roda antes desta chamada) — isso NUNCA deve cair no fallback mock,
 // senão um usuário sem cota continuaria gerando conteúdo "grátis" indefinidamente.
@@ -88,6 +92,27 @@ export async function tryGenerateImageWithAI(params: { career: Career; article: 
     return data
   } catch (error) {
     if (error instanceof QuotaExceededError) throw error
+    return null
+  }
+}
+
+// Narração em áudio da matéria ("Ouvir matéria"). Retorna null em qualquer falha — sem
+// fallback mock aqui, já que não há um "áudio mock" que faça sentido; o botão só reflete
+// indisponibilidade.
+export async function tryGenerateSpeechWithAI(params: { article: Article }): Promise<AiSpeechResult | null> {
+  try {
+    const res = await fetch('/api/articles/speech', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    })
+    if (!res.ok) return null
+
+    const data = (await res.json()) as AiSpeechResult
+    if (!data.audioUrl) return null
+
+    return data
+  } catch {
     return null
   }
 }

@@ -25,6 +25,7 @@ import { isAllowed, remainingFor, canCreateCareer, type UsageField } from '@/lib
 import {
   tryGenerateArticleWithAI,
   tryGenerateImageWithAI,
+  tryGenerateSpeechWithAI,
   tryGenerateCharacterMessageWithAI,
   tryGenerateCharacterReplyWithAI,
 } from '@/lib/ai/client-api'
@@ -136,6 +137,7 @@ type MockDataContextValue = {
 
   generateArticleForCareer: (careerId: string, input: GenerateArticleInput) => Promise<GenerateArticleResult>
   generateImageForArticle: (articleId: string) => Promise<GenerateImageResult>
+  generateSpeechForArticle: (articleId: string) => Promise<{ ok: boolean; audioUrl?: string }>
   getEventsForCareer: (careerId: string) => CareerEvent[]
   getArticlesForCareer: (careerId: string) => Article[]
   getArticleById: (articleId: string) => Article | undefined
@@ -392,6 +394,7 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         imageUrl: welcomeImageUrl,
         imagePrompt: `mock-prompt:${headline}`,
         imageStatus: 'ready',
+        audioUrl: null,
         shareToken: newShareToken(),
         createdAt: new Date().toISOString(),
       }
@@ -535,6 +538,7 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         imageUrl: null,
         imagePrompt: null,
         imageStatus: 'pending',
+        audioUrl: null,
         shareToken: newShareToken(),
         createdAt: new Date().toISOString(),
       }
@@ -694,6 +698,26 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
       return result
     },
     [state.articles, state.careers, state.careerMemories, state.plan, state.usage, supabase]
+  )
+
+  const generateSpeechForArticle = useCallback(
+    async (articleId: string): Promise<{ ok: boolean; audioUrl?: string }> => {
+      const article = state.articles.find((a) => a.id === articleId)
+      if (!article) return { ok: false }
+      // Já narrada antes — reaproveita em vez de gastar de novo com a OpenAI.
+      if (article.audioUrl) return { ok: true, audioUrl: article.audioUrl }
+
+      const result = await tryGenerateSpeechWithAI({ article })
+      if (!result) return { ok: false }
+
+      setState((s) => ({
+        ...s,
+        articles: s.articles.map((a) => (a.id === articleId ? { ...a, audioUrl: result.audioUrl } : a)),
+      }))
+
+      return { ok: true, audioUrl: result.audioUrl }
+    },
+    [state.articles]
   )
 
   const getEventsForCareer = useCallback(
@@ -906,6 +930,7 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     getCareerMemory,
     generateArticleForCareer,
     generateImageForArticle,
+    generateSpeechForArticle,
     getEventsForCareer,
     getArticlesForCareer,
     getArticleById,

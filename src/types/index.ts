@@ -198,6 +198,7 @@ export type Article = {
   imageUrl: string | null
   imagePrompt: string | null
   imageStatus: ImageStatus
+  audioUrl: string | null
   shareToken: string
   createdAt: string
 }

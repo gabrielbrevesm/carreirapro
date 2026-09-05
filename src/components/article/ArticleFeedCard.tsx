@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import type { Article } from '@/types'
 import { ArticleRenderer } from '@/components/article/ArticleRenderer'
 import { ArticleShareButton } from '@/components/article/ArticleShareButton'
+import { ArticlePlayerButton } from '@/components/article/ArticlePlayerButton'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ChevronDown, ChevronUp, ImageIcon } from 'lucide-react'
@@ -62,7 +63,10 @@ export function ArticleFeedCard({ article, defaultExpanded }: { article: Article
       ) : (
         <div>
           <div className="flex items-center justify-between gap-2 px-4 pt-4">
-            <ArticleShareButton shareToken={article.shareToken} />
+            <div className="flex items-center gap-2">
+              <ArticleShareButton shareToken={article.shareToken} />
+              <ArticlePlayerButton article={article} />
+            </div>
             <Button variant="ghost" size="sm" onClick={() => setExpanded(false)}>
               Recolher <ChevronUp className="w-4 h-4 ml-1" />
             </Button>

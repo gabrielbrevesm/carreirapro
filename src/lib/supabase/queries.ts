@@ -185,6 +185,7 @@ type ArticleRow = {
   image_url: string | null
   image_prompt: string | null
   image_status: string
+  audio_url: string | null
   share_token: string
   created_at: string
 }
@@ -207,6 +208,7 @@ export function rowToArticle(row: ArticleRow): Article {
     imageUrl: row.image_url,
     imagePrompt: row.image_prompt,
     imageStatus: row.image_status as Article['imageStatus'],
+    audioUrl: row.audio_url,
     shareToken: row.share_token,
     createdAt: row.created_at,
   }
@@ -230,6 +232,7 @@ export function articleToRow(article: Article): ArticleRow {
     image_url: article.imageUrl,
     image_prompt: article.imagePrompt,
     image_status: article.imageStatus,
+    audio_url: article.audioUrl,
     share_token: article.shareToken,
     created_at: article.createdAt,
   }
