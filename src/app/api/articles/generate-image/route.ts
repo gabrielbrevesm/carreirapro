@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { getOpenAIClient, getConfiguredModel } from '@/lib/ai/openai-client'
 import { generateImageWithGemini, isGeminiConfigured } from '@/lib/ai/gemini-client'
+import { findPlayerPhotoUrl } from '@/lib/players/transfermarkt-photo'
 import { BRIEF_EDITORIAL_SYSTEM_PROMPT, buildBriefEditorialUserMessage } from '@/lib/ai/image-brief-prompt'
 import { ART_DIRECTOR_SYSTEM_PROMPT, buildArtDirectorUserMessage } from '@/lib/ai/art-director-prompt'
 import { saveDataUrlToStorage } from '@/lib/storage/local-storage'
@@ -11,21 +12,33 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { checkAndReserveQuota } from '@/lib/supabase/quota'
 import type { Article, Career } from '@/types'
 
-function extFromPath(url: string): 'png' | 'jpeg' {
-  return /\.jpe?g$/i.test(url) ? 'jpeg' : 'png'
+type ReferenceImage = { mimeType: string; data: string }
+
+const GENERIC_PHOTO_LABELS = new Set([
+  'Esquerda', 'Centro', 'Direita', 'Ao', 'Fundo', 'Torcida', 'Torcedores', 'Diretoria', 'Jogadores',
+  'Imagem', 'Técnico', 'Jovens', 'Jornalistas', 'Comissão', 'Elenco',
+])
+
+function extFromUrl(url: string): 'png' | 'jpeg' {
+  return /\.jpe?g/i.test(url) ? 'jpeg' : 'png'
 }
 
-// A referência facial do técnico só deve ser usada quando ELE é quem aparece na foto — usar a
-// foto dele em uma imagem sobre outro personagem (ex: um jogador) produz a pessoa errada na
-// cena. O Brief Editorial já lista quem aparece em "## PERSONAGENS NA FOTO"; checamos se o nome
-// do técnico aparece nessa seção específica (não na matéria inteira).
-function briefFeaturesManager(brief: string, managerName: string): boolean {
+// O Brief Editorial lista quem aparece em "## PERSONAGENS NA FOTO" (uma pessoa por linha, sem
+// mais nada na linha). Extrai esses nomes pra decidir quais fotos de referência buscar.
+function extractPersonNamesFromBrief(brief: string): string[] {
   const match = brief.match(/##\s*PERSONAGENS NA FOTO([\s\S]*?)(?:\n---|\n##\s|$)/i)
   const section = match?.[1] ?? ''
-  if (!section) return false
-  const lastName = managerName.trim().split(/\s+/).pop() ?? managerName
-  const needle = lastName.toLowerCase()
-  return section.toLowerCase().includes(needle)
+  if (!section) return []
+
+  const names = new Set<string>()
+  for (const rawLine of section.split('\n')) {
+    const line = rawLine.trim().replace(/:$/, '')
+    if (/^[A-ZÀ-Ý][a-zà-ÿ'-]+(?:\s+[A-ZÀ-Ý][a-zà-ÿ'-]+){0,3}$/.test(line)) {
+      const firstWord = line.split(/\s+/)[0]
+      if (!GENERIC_PHOTO_LABELS.has(firstWord)) names.add(line)
+    }
+  }
+  return Array.from(names)
 }
 
 // A foto de referência do técnico vem do Supabase Storage (URL remota, http/https) desde a
@@ -33,7 +46,7 @@ function briefFeaturesManager(brief: string, managerName: string): boolean {
 // anteriores a essa migração. Cobre os dois casos.
 async function loadImageBuffer(url: string): Promise<Buffer> {
   if (/^https?:\/\//i.test(url)) {
-    const res = await fetch(url)
+    const res = await fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0' } })
     if (!res.ok) throw new Error(`Falha ao baixar imagem de referência (${res.status}): ${url}`)
     return Buffer.from(await res.arrayBuffer())
   }
@@ -41,34 +54,71 @@ async function loadImageBuffer(url: string): Promise<Buffer> {
   return readFile(filePath)
 }
 
-// Gera a imagem via Gemini, usando a foto de referência do técnico (quando existe) para manter
-// a semelhança facial dele nas imagens geradas ao longo da carreira. Retorna null em qualquer
-// falha para o chamador cair no motor de fallback (gpt-image-1).
-async function tryGenerateWithGemini(managerPhotoUrl: string | null | undefined, prompt: string): Promise<string | null> {
+// Monta as fotos de referência das pessoas que realmente aparecem NESTA imagem — o técnico
+// (só quando ele é o protagonista da foto, senão o rosto dele vaza pra cenas erradas) e
+// jogadores reais mencionados, buscados no Transfermarkt. Best-effort: um nome sem foto
+// encontrada é simplesmente ignorado, sem travar a geração.
+async function buildReferenceImages(
+  brief: string,
+  career: Career
+): Promise<{ images: ReferenceImage[]; primaryUrl: string | null }> {
+  const names = extractPersonNamesFromBrief(brief)
+  const images: ReferenceImage[] = []
+  let primaryUrl: string | null = null
+
+  const managerLastName = career.managerName.trim().split(/\s+/).pop() ?? career.managerName
+  const managerInPhoto = names.some((n) => n.toLowerCase().includes(managerLastName.toLowerCase()))
+
+  if (managerInPhoto && career.managerPhotoUrl) {
+    try {
+      const buffer = await loadImageBuffer(career.managerPhotoUrl)
+      images.push({ mimeType: `image/${extFromUrl(career.managerPhotoUrl)}`, data: buffer.toString('base64') })
+      primaryUrl = career.managerPhotoUrl
+    } catch (error) {
+      console.error('[/api/articles/generate-image] falha ao carregar foto do técnico', error)
+    }
+  }
+
+  const playerNames = names.filter((n) => !n.toLowerCase().includes(managerLastName.toLowerCase()))
+  for (const name of playerNames.slice(0, 3)) {
+    const photoUrl = await findPlayerPhotoUrl(name)
+    if (!photoUrl) continue
+    try {
+      const buffer = await loadImageBuffer(photoUrl)
+      images.push({ mimeType: `image/${extFromUrl(photoUrl)}`, data: buffer.toString('base64') })
+      primaryUrl ??= photoUrl
+    } catch (error) {
+      console.error(`[/api/articles/generate-image] falha ao carregar foto de ${name}`, error)
+    }
+  }
+
+  return { images, primaryUrl }
+}
+
+// Motor principal: Gemini, que preserva muito melhor a semelhança facial de pessoas reais a
+// partir de fotos de referência do que o gpt-image-1. Retorna null em qualquer falha para o
+// chamador cair no motor de fallback.
+async function tryGenerateWithGemini(referenceImages: ReferenceImage[], prompt: string): Promise<string | null> {
   if (!isGeminiConfigured()) return null
   try {
-    let referenceImages: { mimeType: string; data: string }[] | undefined
-    if (managerPhotoUrl) {
-      const buffer = await loadImageBuffer(managerPhotoUrl)
-      referenceImages = [{ mimeType: `image/${extFromPath(managerPhotoUrl)}`, data: buffer.toString('base64') }]
-    }
-    return await generateImageWithGemini({ prompt, referenceImages })
+    return await generateImageWithGemini({ prompt, referenceImages: referenceImages.length ? referenceImages : undefined })
   } catch (error) {
     console.error('[/api/articles/generate-image] Gemini falhou, usando gpt-image-1 como fallback', error)
     return null
   }
 }
 
-// Fallback: OpenAI gpt-image-1 (usado só se o Gemini não estiver configurado ou falhar).
-async function tryEditWithManagerPhoto(
+// Fallback: OpenAI gpt-image-1 (usado só se o Gemini não estiver configurado ou falhar). O
+// endpoint de edit só aceita uma imagem de referência, então usa apenas a principal.
+async function tryEditWithReferencePhoto(
   client: NonNullable<ReturnType<typeof getOpenAIClient>>,
-  managerPhotoUrl: string,
+  referencePhotoUrl: string,
   prompt: string
 ): Promise<string | null> {
   try {
     const { toFile } = await import('openai')
-    const buffer = await loadImageBuffer(managerPhotoUrl)
-    const image = await toFile(buffer, 'manager-reference.png', { type: 'image/png' })
+    const buffer = await loadImageBuffer(referencePhotoUrl)
+    const image = await toFile(buffer, 'reference.png', { type: 'image/png' })
 
     const editResponse = await client.images.edit({
       model: 'gpt-image-1',
@@ -81,7 +131,7 @@ async function tryEditWithManagerPhoto(
 
     return editResponse.data?.[0]?.b64_json ?? null
   } catch (error) {
-    console.error('[/api/articles/generate-image] edit com foto do técnico falhou, usando generate padrão', error)
+    console.error('[/api/articles/generate-image] edit com foto de referência falhou, usando generate padrão', error)
     return null
   }
 }
@@ -142,19 +192,14 @@ export async function POST(req: NextRequest) {
     const imagePrompt = artCompletion.choices[0]?.message?.content
     if (!imagePrompt) throw new Error('Prompt de imagem vazio')
 
-    // Só usa a foto de referência do técnico quando ele é de fato quem aparece nesta imagem
-    // específica — caso contrário ela acaba colocando o rosto/corpo dele em cena errada.
-    const managerPhotoForThisImage =
-      body.career.managerPhotoUrl && briefFeaturesManager(brief, body.career.managerName)
-        ? body.career.managerPhotoUrl
-        : null
+    // Referências faciais das pessoas reais que aparecem NESTA imagem específica — técnico
+    // (só quando é o protagonista da foto) e jogadores reais mencionados, via Transfermarkt.
+    const { images: referenceImages, primaryUrl } = await buildReferenceImages(brief, body.career)
 
-    // Motor de renderização: Gemini primeiro (bem melhor pra preservar a semelhança facial de uma
-    // pessoa real a partir da foto de referência do técnico), com fallback pro gpt-image-1.
-    let b64: string | null = await tryGenerateWithGemini(managerPhotoForThisImage, imagePrompt.slice(0, 4000))
+    let b64: string | null = await tryGenerateWithGemini(referenceImages, imagePrompt.slice(0, 4000))
 
-    if (!b64 && managerPhotoForThisImage) {
-      b64 = await tryEditWithManagerPhoto(client, managerPhotoForThisImage, imagePrompt.slice(0, 32000))
+    if (!b64 && primaryUrl) {
+      b64 = await tryEditWithReferencePhoto(client, primaryUrl, imagePrompt.slice(0, 32000))
     }
 
     if (!b64) {
