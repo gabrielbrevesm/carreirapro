@@ -60,7 +60,12 @@ export function buildMediaCoverageBrief(result: MediaSelectionResult): string {
   lines.push(
     'IMPORTANTE: toda fala gerada é FICTÍCIA — nunca apresente como declaração real que essa',
     'pessoa disse. É uma reação plausível dentro do universo simulado do modo carreira, coerente',
-    'com o perfil editorial dela, não uma citação real.'
+    'com o perfil editorial dela, não uma citação real.',
+    '',
+    'FORMATO: no subtítulo "### Nome" de cada jornalista, escreva SOMENTE o nome — nunca o',
+    'veículo entre parênteses (ex: "### Fabrizio Romano", nunca "### Fabrizio Romano (The',
+    'Athletic)"). O veículo já aparece indicado acima; mencione-o no texto da fala se for',
+    'relevante, não no próprio subtítulo.'
   )
 
   return lines.join('\n')

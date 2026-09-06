@@ -4,6 +4,7 @@
 
 export type FreeformQuoteEntry = {
   name: string
+  outlet: string | null
   quotes: string[]
 }
 
@@ -51,7 +52,14 @@ function parseSubEntries(sectionBody: string): FreeformQuoteEntry[] {
     if (headingMatch) {
       flushParagraphAsQuote()
       if (current) entries.push(current)
-      current = { name: headingMatch[1].trim(), quotes: [] }
+      // A IA às vezes escreve "Nome (Veículo)" no próprio subtítulo — separa isso do nome, senão
+      // o "(Veículo)" vaza pro nome exibido e quebra a busca/iniciais do avatar (ex: "Fulano (UOL)"
+      // virava "F(" nas iniciais).
+      const rawHeading = headingMatch[1].trim()
+      const outletMatch = rawHeading.match(/^(.*?)\s*\(([^()]+)\)\s*$/)
+      current = outletMatch
+        ? { name: outletMatch[1].trim(), outlet: outletMatch[2].trim(), quotes: [] }
+        : { name: rawHeading, outlet: null, quotes: [] }
       continue
     }
     const quoteMatch = line.match(/^>\s?(.*)$/)

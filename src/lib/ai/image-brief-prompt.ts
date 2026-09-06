@@ -110,11 +110,32 @@ Listar:
 - expressão;
 - ação.
 
-Exemplo
+REGRA CRÍTICA — SEMPRE O NOME COMPLETO REAL, NUNCA SÓ O APELIDO:
+
+Muitos jogadores brasileiros e sul-americanos têm apelidos que coincidem com nomes de
+personagens fictícios famosos (ex: "Cebolinha" é apelido do jogador Everton, mas também é o
+personagem da Turma da Mônica; o mesmo risco existe com outros apelidos de bicho, objeto ou
+personagem popular). Um gerador de imagens NUNCA deve receber apenas o apelido sozinho — ele
+pode desenhar o personagem errado.
+
+Por isso, para cada pessoa real citada (jogador, técnico, dirigente), escreva sempre:
+
+nome completo real + apelido entre parênteses se houver + "(jogador de futebol profissional)"
+ou "(técnico de futebol)" conforme o caso.
+
+Exemplo correto: "Everton Cebolinha (jogador de futebol profissional, atacante) — apelidado de
+Cebolinha, mas é uma pessoa real, nunca o personagem de desenho animado."
+
+Exemplo errado (nunca fazer): "Cebolinha comemorando o gol."
+
+Todo personagem citado aqui é sempre um ser humano adulto real — nunca um personagem de
+desenho, mascote, animal ou figura fictícia, mesmo quando o nome/apelido sugerir isso.
+
+Exemplo de formato
 
 Esquerda:
 
-Imagem do técnico (Se for fictício, peça ao usuário para subir uma foto junto ao texto. Se não for fictício busque no Google por uma imagem da pessoa citada)
+Nome completo real do técnico (técnico de futebol)
 
 Sorrindo discretamente
 
@@ -122,7 +143,7 @@ Segurando a camisa.
 
 Centro:
 
-Isco
+Nome completo real do jogador (jogador de futebol profissional) — apelido entre parênteses se houver
 
 Sorrindo.
 

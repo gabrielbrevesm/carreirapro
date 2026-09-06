@@ -23,19 +23,25 @@ function extFromUrl(url: string): 'png' | 'jpeg' {
   return /\.jpe?g/i.test(url) ? 'jpeg' : 'png'
 }
 
-// O Brief Editorial lista quem aparece em "## PERSONAGENS NA FOTO" (uma pessoa por linha, sem
-// mais nada na linha). Extrai esses nomes pra decidir quais fotos de referência buscar.
+// O Brief Editorial lista quem aparece em "## PERSONAGENS NA FOTO". O formato varia (o modelo
+// às vezes escreve só o nome numa linha, às vezes "Nome Sobrenome (jogador de futebol
+// profissional)" — a instrução pede esse qualificador explicitamente pra evitar confundir
+// apelidos com personagens fictícios) — por isso extrai qualquer sequência de palavras
+// capitalizadas de CADA linha, em vez de exigir que a linha inteira seja só o nome.
 function extractPersonNamesFromBrief(brief: string): string[] {
   const match = brief.match(/##\s*PERSONAGENS NA FOTO([\s\S]*?)(?:\n---|\n##\s|$)/i)
   const section = match?.[1] ?? ''
   if (!section) return []
 
   const names = new Set<string>()
+  const nameRun = /\b[A-ZÀ-Ý][a-zà-ÿ'-]+(?:\s+[A-ZÀ-Ý][a-zà-ÿ'-]+){0,3}\b/g
   for (const rawLine of section.split('\n')) {
-    const line = rawLine.trim().replace(/:$/, '')
-    if (/^[A-ZÀ-Ý][a-zà-ÿ'-]+(?:\s+[A-ZÀ-Ý][a-zà-ÿ'-]+){0,3}$/.test(line)) {
-      const firstWord = line.split(/\s+/)[0]
-      if (!GENERIC_PHOTO_LABELS.has(firstWord)) names.add(line)
+    const line = rawLine.trim()
+    if (!line) continue
+    for (const found of line.matchAll(nameRun)) {
+      const candidate = found[0].trim()
+      const firstWord = candidate.split(/\s+/)[0]
+      if (!GENERIC_PHOTO_LABELS.has(firstWord)) names.add(candidate)
     }
   }
   return Array.from(names)

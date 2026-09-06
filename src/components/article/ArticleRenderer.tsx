@@ -100,9 +100,12 @@ function FreeformSections({ blocks }: { blocks: FreeformBlock[] }) {
               <div className="grid gap-3">
                 {block.entries.map((entry, ei) => (
                   <div key={ei} className="border rounded-lg p-4 space-y-1.5">
-                    <div className="flex items-center gap-2.5">
-                      <PunditAvatar name={entry.name} className="w-8 h-8" />
-                      <span className="font-semibold text-sm">{entry.name}</span>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <div className="flex items-center gap-2.5">
+                        <PunditAvatar name={entry.name} className="w-8 h-8" />
+                        <span className="font-semibold text-sm">{entry.name}</span>
+                      </div>
+                      {entry.outlet && <OutletBadge label={entry.outlet} className="text-[10px] px-1.5 py-0.5" />}
                     </div>
                     {entry.quotes.map((q, qi) => (
                       <p key={qi} className="text-sm italic border-l-2 pl-3 text-muted-foreground">
