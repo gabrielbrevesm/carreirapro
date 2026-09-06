@@ -41,6 +41,23 @@ export type AiBoleiroInsightsResult = {
   newCareerSuggestions: string[]
 }
 
+// Transcreve um áudio gravado no composer de matéria (o usuário fala em vez de digitar).
+// Retorna null em qualquer falha — quem chama mantém o botão de microfone, sem fallback mock
+// (não existe "transcrição falsa" que faça sentido).
+export async function tryTranscribeAudio(audioBlob: Blob): Promise<string | null> {
+  try {
+    const formData = new FormData()
+    formData.append('audio', audioBlob, 'gravacao.webm')
+    const res = await fetch('/api/articles/transcribe', { method: 'POST', body: formData })
+    if (!res.ok) return null
+
+    const data = (await res.json()) as { text?: string }
+    return data.text?.trim() || null
+  } catch {
+    return null
+  }
+}
+
 // Sinaliza que o SERVIDOR recusou por cota esgotada (verificação real no banco, não a
 // pré-checagem local que já roda antes desta chamada) — isso NUNCA deve cair no fallback mock,
 // senão um usuário sem cota continuaria gerando conteúdo "grátis" indefinidamente.
@@ -59,6 +76,7 @@ export async function tryGenerateArticleWithAI(params: {
   memory: CareerMemory
   rawInput: string
   isFirstEvent: boolean
+  attachmentUrl?: string | null
 }): Promise<AiArticleResult | null> {
   try {
     const res = await fetch('/api/articles/generate', {

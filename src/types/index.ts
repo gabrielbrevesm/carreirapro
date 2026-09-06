@@ -41,6 +41,12 @@ export type Career = {
   currentSeason: string | null
   eventsCount: number
   isActive: boolean
+  // Perfil pessoal do técnico — tudo opcional, preenchido na tela "Técnico" da carreira.
+  // Quando presente, a IA usa como contexto extra ao escrever as matérias.
+  playingStyle: string | null
+  preferredFormation: string | null
+  personalTastes: string | null
+  careerMilestones: string | null
   createdAt: string
   updatedAt: string
 }

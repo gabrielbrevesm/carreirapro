@@ -134,6 +134,10 @@ type MockDataContextValue = {
   getCareerBySlug: (slug: string) => Career | undefined
   getMostRecentCareer: () => Career | undefined
   getCareerMemory: (careerId: string) => CareerMemory
+  updateCareerProfile: (
+    careerId: string,
+    fields: Partial<Pick<Career, 'managerPhotoUrl' | 'playingStyle' | 'preferredFormation' | 'personalTastes' | 'careerMilestones'>>
+  ) => Promise<{ ok: boolean }>
 
   generateArticleForCareer: (careerId: string, input: GenerateArticleInput) => Promise<GenerateArticleResult>
   generateImageForArticle: (articleId: string) => Promise<GenerateImageResult>
@@ -323,6 +327,10 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         currentSeason: input.seasonStart,
         eventsCount: 1,
         isActive: true,
+        playingStyle: null,
+        preferredFormation: null,
+        personalTastes: null,
+        careerMilestones: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
@@ -436,6 +444,38 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     [state.careerMemories]
   )
 
+  // Tela "Técnico" da carreira — foto (troca a do técnico real/fictício) e o perfil pessoal
+  // opcional que a IA passa a usar como contexto extra ao escrever as matérias.
+  const updateCareerProfile = useCallback(
+    async (careerId: string, fields: Partial<Pick<Career, 'managerPhotoUrl' | 'playingStyle' | 'preferredFormation' | 'personalTastes' | 'careerMilestones'>>) => {
+      const updatedAt = new Date().toISOString()
+      const columnMap: Record<string, string> = {
+        managerPhotoUrl: 'manager_photo_url',
+        playingStyle: 'playing_style',
+        preferredFormation: 'preferred_formation',
+        personalTastes: 'personal_tastes',
+        careerMilestones: 'career_milestones',
+      }
+      const row: Record<string, unknown> = { updated_at: updatedAt }
+      for (const [key, value] of Object.entries(fields)) {
+        row[columnMap[key]] = value
+      }
+
+      const { error } = await supabase.from('careers').update(row).eq('id', careerId)
+      if (error) {
+        console.error('[updateCareerProfile] falha ao salvar', error)
+        return { ok: false }
+      }
+
+      setState((s) => ({
+        ...s,
+        careers: s.careers.map((c) => (c.id === careerId ? { ...c, ...fields, updatedAt } : c)),
+      }))
+      return { ok: true }
+    },
+    [supabase]
+  )
+
   const generateArticleForCareer = useCallback(
     async (careerId: string, input: GenerateArticleInput): Promise<GenerateArticleResult> => {
       const career = state.careers.find((c) => c.id === careerId)
@@ -450,7 +490,13 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
 
       let aiResult: Awaited<ReturnType<typeof tryGenerateArticleWithAI>>
       try {
-        aiResult = await tryGenerateArticleWithAI({ career, memory, rawInput: input.rawInput, isFirstEvent: false })
+        aiResult = await tryGenerateArticleWithAI({
+          career,
+          memory,
+          rawInput: input.rawInput,
+          isFirstEvent: false,
+          attachmentUrl: input.attachmentUrl,
+        })
       } catch (error) {
         // Cota esgotada de verdade (verificada no servidor) — nunca cai pro mock aqui, senão o
         // usuário continuaria gerando conteúdo "grátis" pra sempre.
@@ -930,6 +976,7 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     getCareerBySlug,
     getMostRecentCareer,
     getCareerMemory,
+    updateCareerProfile,
     generateArticleForCareer,
     generateImageForArticle,
     generateSpeechForArticle,

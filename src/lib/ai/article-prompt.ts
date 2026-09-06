@@ -723,6 +723,28 @@ Exemplos:
 
 Quando um jogador começa a produzir números relevantes, conecte isso ao papel tático.
 
+--------------------------------------------------
+REGRA CRÍTICA — NÃO INVENTAR O ELENCO DE CLUBES REAIS
+
+Seu conhecimento sobre elencos reais tem uma data de corte e pode estar desatualizado — jogadores
+saem, chegam, são emprestados ou mudam de posição com frequência, principalmente entre janelas de
+mercado. Por isso, ao citar um jogador específico pelo nome como parte do elenco de um clube real:
+
+- só faça isso se o usuário já mencionou esse jogador explicitamente nesta carreira (nos fatos
+  estabelecidos, numa contratação registrada, ou no relato do evento atual);
+- nunca presuma que um jogador que você "sabe" que joga (ou jogava) naquele clube real ainda está
+  lá — a memória da carreira (fatos estabelecidos, contratações) é a ÚNICA fonte confiável sobre
+  quem compõe o elenco atual;
+- quando precisar mencionar "mais um jogador" sem ter esse nome confirmado pelo usuário, use uma
+  referência genérica pela função (ex: "um dos zagueiros", "o camisa 9", "o lateral titular") em
+  vez de inventar ou chutar um nome real específico;
+- isso vale inclusive para o técnico: não assuma escalação, sistema tático ou reservas que o
+  usuário não tenha informado.
+
+Essa regra é sobre REALISMO, não sobre pobreza narrativa — dá pra escrever uma matéria rica e
+específica só com os nomes que o usuário já trouxe para dentro da carreira.
+--------------------------------------------------
+
 ==================================================
 10. TRATAMENTO DE VITÓRIAS E DERROTAS
 ==================================================
@@ -937,6 +959,7 @@ Nunca:
 - invente resultados;
 - invente autores de gols;
 - invente transferências;
+- cite um jogador real específico como parte do elenco atual de um clube sem o usuário ter confirmado isso nesta carreira;
 - invente valores;
 - invente lesões;
 - troque a nacionalidade de jogadores;
@@ -1234,10 +1257,16 @@ export function buildUserMessage(params: {
   memory: CareerMemory
   rawInput: string
   isFirstEvent: boolean
+  hasAttachment?: boolean
 }): string {
-  const { career, memory, rawInput, isFirstEvent } = params
+  const { career, memory, rawInput, isFirstEvent, hasAttachment } = params
   const parts: string[] = []
 
+  const today = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })
+  parts.push(
+    `DATA REAL DE HOJE: ${today}. Use isso apenas para se situar (janela de mercado, época do ano) — nunca para presumir escalação ou elenco atual de um clube real (ver regra crítica sobre elenco).`
+  )
+  parts.push('')
   parts.push('CONTEXTO DA CARREIRA:')
   parts.push(`Treinador: ${career.managerName} (${career.managerType === 'real' ? 'técnico real' : 'técnico fictício'})`)
   parts.push(`Clube: ${career.clubName} | Liga: ${career.clubLeague} | País: ${career.clubCountry}`)
@@ -1245,6 +1274,14 @@ export function buildUserMessage(params: {
   if (career.initialObjective) parts.push(`Objetivo da passagem: ${career.initialObjective}`)
   if (career.managerOrigin) parts.push(`Como chegou ao clube: ${career.managerOrigin}`)
   if (career.managerBio) parts.push(`Contexto/reputação do técnico: ${career.managerBio}`)
+
+  if (career.playingStyle || career.preferredFormation || career.personalTastes || career.careerMilestones) {
+    parts.push('\nPERFIL PESSOAL DO TÉCNICO (informado pelo usuário — use como contexto real, nunca contradiga):')
+    if (career.playingStyle) parts.push(`Estilo de jogo: ${career.playingStyle}`)
+    if (career.preferredFormation) parts.push(`Formação preferida: ${career.preferredFormation}`)
+    if (career.personalTastes) parts.push(`Gostos pessoais: ${career.personalTastes}`)
+    if (career.careerMilestones) parts.push(`Marcos importantes na carreira: ${career.careerMilestones}`)
+  }
 
   const memoryContext = formatMemoryContext(memory)
   if (memoryContext) parts.push(`\n${memoryContext}`)
@@ -1255,6 +1292,12 @@ export function buildUserMessage(params: {
       : '\nACONTECIMENTO A COBRIR (enviado pelo usuário):'
   )
   parts.push(rawInput.trim())
+
+  if (hasAttachment) {
+    parts.push(
+      '\nO usuário também anexou uma imagem (print/foto do save — pode ser tela de resultados, calendário, elenco, etc). Extraia dela todos os fatos relevantes (placares, adversários, datas, jogadores, estatísticas) e trate como informação real e confirmada, com a mesma prioridade do texto acima — nunca invente o que não conseguir ler com clareza na imagem.'
+    )
+  }
 
   return parts.join('\n')
 }

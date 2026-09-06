@@ -25,6 +25,10 @@ type CareerRow = {
   current_season: string | null
   events_count: number
   is_active: boolean
+  playing_style: string | null
+  preferred_formation: string | null
+  personal_tastes: string | null
+  career_milestones: string | null
   created_at: string
   updated_at: string
 }
@@ -47,6 +51,10 @@ export function rowToCareer(row: CareerRow): Career {
     currentSeason: row.current_season,
     eventsCount: row.events_count,
     isActive: row.is_active,
+    playingStyle: row.playing_style,
+    preferredFormation: row.preferred_formation,
+    personalTastes: row.personal_tastes,
+    careerMilestones: row.career_milestones,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -71,6 +79,10 @@ export function careerToRow(userId: string, career: Career): CareerRow {
     current_season: career.currentSeason,
     events_count: career.eventsCount,
     is_active: career.isActive,
+    playing_style: career.playingStyle,
+    preferred_formation: career.preferredFormation,
+    personal_tastes: career.personalTastes,
+    career_milestones: career.careerMilestones,
     created_at: career.createdAt,
     updated_at: career.updatedAt,
   }
