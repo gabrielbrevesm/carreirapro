@@ -62,7 +62,8 @@ function Bubble({ from, children }: { from: 'bot' | 'user'; children: React.Reac
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const { state, isHydrated, createCareerAndFirstArticle, canCreateNewCareer, getMostRecentCareer } = useMockData()
+  const { state, isHydrated, createCareerAndFirstArticle, getMostRecentCareer, generateImageForArticle, getArticleById } =
+    useMockData()
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const [step, setStep] = useState<Step>('intro')
@@ -89,18 +90,24 @@ export default function OnboardingPage() {
   const [resultArticle, setResultArticle] = useState<Article | null>(null)
   const [resultSlug, setResultSlug] = useState<string | null>(null)
 
+  // Reflete as atualizações da matéria (imageStatus indo de pending → generating → ready) —
+  // resultArticle é só o snapshot no momento da criação, o estado real vive no store.
+  const liveResultArticle = resultArticle ? (getArticleById(resultArticle.id) ?? resultArticle) : null
+
+  // Mesmo padrão usado na página de matéria e no feed da carreira: a matéria nasce com a
+  // imagem "pending" e quem exibe é quem dispara a geração real (evita travar o fim do
+  // onboarding esperando ~20-40s de pipeline de imagem).
+  useEffect(() => {
+    if (!liveResultArticle || liveResultArticle.imageStatus !== 'pending') return
+    const timer = setTimeout(() => {
+      generateImageForArticle(liveResultArticle.id)
+    }, 1200)
+    return () => clearTimeout(timer)
+  }, [liveResultArticle, generateImageForArticle])
+
   useEffect(() => {
     if (isHydrated && !state.isAuthenticated) router.replace('/login')
   }, [isHydrated, state.isAuthenticated, router])
-
-  const eligibilityCheckedRef = useRef(false)
-  useEffect(() => {
-    // Só verifica uma vez, na hidratação inicial — evita competir com a criação
-    // da carreira que acontece mais adiante neste mesmo fluxo.
-    if (!isHydrated || eligibilityCheckedRef.current) return
-    eligibilityCheckedRef.current = true
-    if (!canCreateNewCareer()) router.replace('/settings?paywall=new_career')
-  }, [isHydrated, canCreateNewCareer, router])
 
   const isLastIntroMessage = introMessageIndex >= INTRO_MESSAGES.length - 1
 
@@ -356,11 +363,11 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {step === 'result' && resultArticle && (
+            {step === 'result' && liveResultArticle && (
               <div className="pt-2 space-y-4">
                 <Bubble from="bot">Pronto! Aqui está a primeira matéria da sua carreira:</Bubble>
                 <div className="rounded-2xl border bg-card overflow-hidden">
-                  <ArticleRenderer article={resultArticle} />
+                  <ArticleRenderer article={liveResultArticle} />
                 </div>
               </div>
             )}

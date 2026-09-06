@@ -21,7 +21,7 @@ import { generateMockArticle, generateHiringAnnouncementArticle, extractMockMemo
 import { generateMockArticleImage } from '@/lib/mock/image-generator'
 import { analyzeMockSquad } from '@/lib/mock/squad-analyzer'
 import { classifyEventType, extractCompetition } from '@/lib/mock/event-classifier'
-import { isAllowed, remainingFor, canCreateCareer, type UsageField } from '@/lib/freemium'
+import { isAllowed, remainingFor, type UsageField } from '@/lib/freemium'
 import {
   tryGenerateArticleWithAI,
   tryGenerateImageWithAI,
@@ -156,7 +156,6 @@ type MockDataContextValue = {
 
   usageRemaining: (field: UsageField) => number | null
   isFeatureAllowed: (field: UsageField) => boolean
-  canCreateNewCareer: () => boolean
   refreshProfile: () => Promise<UserPlan>
 }
 
@@ -374,14 +373,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         generationTimeMs = mockGenerated.generationTimeMs
       }
 
-      // Imagem da matéria de boas-vindas é gerada de imediato e não consome a cota gratuita
-      // (é uma demonstração da experiência, não uma geração real solicitada pelo usuário).
-      const welcomeImageUrl = generateMockArticleImage({
-        headline,
-        clubName: career.clubName,
-        eventType: 'season_start',
-      })
-
       const article: Article = {
         id: randomId(),
         careerId: career.id,
@@ -396,9 +387,12 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         modelUsed,
         tokensUsed,
         generationTimeMs,
-        imageUrl: welcomeImageUrl,
-        imagePrompt: `mock-prompt:${headline}`,
-        imageStatus: 'ready',
+        // Assim como qualquer outra matéria: fica "pending" e quem exibe a matéria dispara a
+        // geração real da imagem (ver useEffect no onboarding) — antes isso ficava travado num
+        // placeholder mock que nunca virava imagem de verdade.
+        imageUrl: null,
+        imagePrompt: null,
+        imageStatus: 'pending',
         audioUrl: null,
         shareToken: newShareToken(),
         createdAt: new Date().toISOString(),
@@ -896,7 +890,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
 
   const usageRemaining = useCallback((field: UsageField) => remainingFor(state.plan, state.usage, field), [state.plan, state.usage])
   const isFeatureAllowed = useCallback((field: UsageField) => isAllowed(state.plan, state.usage, field), [state.plan, state.usage])
-  const canCreateNewCareer = useCallback(() => canCreateCareer(state.plan, state.careers.length), [state.plan, state.careers.length])
 
   // Rebusca plano/uso reais do banco — chamado depois de voltar do checkout do Stripe (o
   // webhook já deve ter persistido o plano 'pro' a essa altura) em vez de fingir localmente
@@ -955,7 +948,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     clearLatestCharacterNotification,
     usageRemaining,
     isFeatureAllowed,
-    canCreateNewCareer,
     refreshProfile,
   }
 
