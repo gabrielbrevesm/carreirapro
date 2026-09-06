@@ -5,9 +5,9 @@ import { Separator } from '@/components/ui/separator'
 import { MessageCircle, Camera, ThumbsUp, Repeat2 } from 'lucide-react'
 import { parseFreeformArticle, type FreeformBlock } from '@/lib/ai/parse-freeform-article'
 import { OutletBadge } from '@/components/article/OutletBadge'
-import { PlayerAvatar } from '@/components/shared/PlayerAvatar'
 import { PunditAvatar } from '@/components/shared/PunditAvatar'
 import { ClubBadge } from '@/components/shared/ClubBadge'
+import { SocialAvatar, GenericSocialAvatar } from '@/components/article/SocialAvatar'
 import { EditorialPhoto } from '@/components/article/EditorialPhoto'
 import { ArticlePlayerButton } from '@/components/article/ArticlePlayerButton'
 
@@ -125,9 +125,7 @@ function FreeformSections({ blocks }: { blocks: FreeformBlock[] }) {
                 {block.entries.map((entry, ei) => (
                   <div key={ei} className="border rounded-xl p-4 space-y-2 bg-card">
                     <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold shrink-0">
-                        {entry.name[0]}
-                      </div>
+                      <GenericSocialAvatar name={entry.name} className="w-8 h-8" />
                       <p className="text-sm font-medium">{entry.name}</p>
                     </div>
                     {entry.quotes.map((q, qi) => (
@@ -260,13 +258,7 @@ function StructuredSections({ sections }: { sections: NonNullable<Article['secti
               <div key={i} className="border rounded-xl p-4 space-y-2 bg-card">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 min-w-0">
-                    {post.accountType === 'player' ? (
-                      <PlayerAvatar name={post.displayName} className="w-8 h-8" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-bold shrink-0">
-                        {post.displayName[0]}
-                      </div>
-                    )}
+                    <SocialAvatar post={post} className="w-8 h-8" />
                     <div className="min-w-0 flex items-center gap-1.5">
                       {post.countryCode && (
                         <span className="text-[9px] font-bold text-muted-foreground border rounded px-1 py-0.5 shrink-0">{post.countryCode}</span>

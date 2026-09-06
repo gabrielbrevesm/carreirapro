@@ -178,11 +178,6 @@ export default function CareerHubPage({ params }: { params: Promise<{ careerSlug
         </div>
         <div className="flex gap-1.5 shrink-0">
           <Button variant="outline" size="icon" asChild>
-            <Link href={`/careers/${career.slug}/staff`} title="Técnico">
-              <User className="w-4 h-4" />
-            </Link>
-          </Button>
-          <Button variant="outline" size="icon" asChild>
             <Link href={`/careers/${career.slug}/timeline`} title="Timeline">
               <History className="w-4 h-4" />
             </Link>
@@ -194,6 +189,16 @@ export default function CareerHubPage({ params }: { params: Promise<{ careerSlug
           </Button>
         </div>
       </div>
+
+      <Link
+        href={`/careers/${career.slug}/staff`}
+        className="inline-flex w-fit items-center gap-2 self-start rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 py-1.5 pr-4 pl-2 text-sm font-medium text-white shadow-sm transition-all hover:from-violet-500 hover:to-fuchsia-500"
+      >
+        <span className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20">
+          <User className="w-3.5 h-3.5" />
+        </span>
+        Editar perfil do técnico
+      </Link>
 
       <div className="flex flex-col gap-3">
         {articles.length === 0 ? (

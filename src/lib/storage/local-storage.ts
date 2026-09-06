@@ -24,7 +24,15 @@ function parseDataUrl(dataUrl: string): { mime: string; buffer: Buffer } | null 
   return { mime: match[1], buffer: Buffer.from(match[2], 'base64') }
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
 // Salva um data URL base64 (ex: "data:image/png;base64,...") no Supabase Storage e retorna a URL pública.
+// O upload em si já falhou de forma intermitente em produção (erro 520, transiente do lado do
+// Supabase Storage) DEPOIS de já termos pago pela geração da imagem na OpenAI/Gemini — perder a
+// imagem inteira por causa disso é um desperdício bobo, então tenta mais 2 vezes com um respiro
+// curto antes de desistir de verdade.
 export async function saveDataUrlToStorage(dataUrl: string, category: UploadCategory): Promise<string> {
   const parsed = parseDataUrl(dataUrl)
   if (!parsed) throw new Error('Data URL inválida')
@@ -33,11 +41,19 @@ export async function saveDataUrlToStorage(dataUrl: string, category: UploadCate
   if (!admin) throw new Error('Supabase admin client indisponível (SUPABASE_SERVICE_ROLE_KEY ausente)')
 
   const path = `${category}/${randomId()}.${extFromMime(parsed.mime)}`
-  const { error } = await admin.storage.from(BUCKET).upload(path, parsed.buffer, {
-    contentType: parsed.mime,
-    upsert: false,
-  })
-  if (error) throw error
 
-  return admin.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
+  let lastError: unknown = null
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    const { error } = await admin.storage.from(BUCKET).upload(path, parsed.buffer, {
+      contentType: parsed.mime,
+      upsert: false,
+    })
+    if (!error) return admin.storage.from(BUCKET).getPublicUrl(path).data.publicUrl
+
+    lastError = error
+    console.error(`[saveDataUrlToStorage] tentativa ${attempt}/3 falhou`, error)
+    if (attempt < 3) await sleep(500 * attempt)
+  }
+
+  throw lastError
 }

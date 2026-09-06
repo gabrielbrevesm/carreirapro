@@ -8,7 +8,7 @@ import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { EmptyState } from '@/components/shared/EmptyState'
 import { CareerTimeline } from '@/components/career/CareerTimeline'
 import { Button } from '@/components/ui/button'
-import { Trophy } from 'lucide-react'
+import { ArrowLeft, Trophy } from 'lucide-react'
 
 export default function CareerTimelinePage({ params }: { params: Promise<{ careerSlug: string }> }) {
   const { careerSlug } = use(params)
@@ -35,11 +35,18 @@ export default function CareerTimelinePage({ params }: { params: Promise<{ caree
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Timeline</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {career.managerName} · {career.clubName}
-        </p>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild className="-ml-2 shrink-0">
+          <Link href={`/careers/${career.slug}`}>
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+        </Button>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight">Timeline</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {career.managerName} · {career.clubName}
+          </p>
+        </div>
       </div>
       <CareerTimeline events={events} articles={articles} careerSlug={career.slug} />
     </div>

@@ -274,7 +274,9 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    // h-dvh (não min-h-screen): no mobile, 100vh ignora o teclado virtual abrindo — o rodapé
+    // com o campo de texto ficava escondido atrás dele. dvh acompanha a altura visível de verdade.
+    <div className="h-dvh flex flex-col bg-background overflow-hidden">
       <header className="flex items-center gap-2 px-4 py-4 border-b shrink-0">
         <Button variant="ghost" size="icon" className="-ml-2" onClick={handleBack}>
           <ArrowLeft className="w-4 h-4" />

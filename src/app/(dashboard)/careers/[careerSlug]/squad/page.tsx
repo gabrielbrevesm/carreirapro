@@ -11,7 +11,7 @@ import { SquadUploader } from '@/components/squad/SquadUploader'
 import { TransferSuggestionCard } from '@/components/squad/TransferSuggestionCard'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Trophy, Users } from 'lucide-react'
+import { ArrowLeft, Trophy, Users } from 'lucide-react'
 import type { SquadAnalysis } from '@/types'
 
 export default function SquadAnalysisPage({ params }: { params: Promise<{ careerSlug: string }> }) {
@@ -41,11 +41,18 @@ export default function SquadAnalysisPage({ params }: { params: Promise<{ career
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Análise de Elenco</h1>
-        <p className="text-muted-foreground text-sm mt-1">
-          {career.managerName} · {career.clubName}
-        </p>
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" asChild className="-ml-2 shrink-0">
+          <Link href={`/careers/${career.slug}`}>
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+        </Button>
+        <div className="min-w-0">
+          <h1 className="text-2xl font-bold tracking-tight">Análise de Elenco</h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {career.managerName} · {career.clubName}
+          </p>
+        </div>
       </div>
 
       {!canAnalyze ? (

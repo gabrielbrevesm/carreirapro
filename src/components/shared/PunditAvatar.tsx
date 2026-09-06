@@ -1,8 +1,11 @@
+'use client'
+
+import { useEffect, useState } from 'react'
 import { cn } from '@/lib/utils'
 
-// Avatar de iniciais com cor determinística por nome — usado pros comentaristas do "Debate na
-// Imprensa". Não busca foto real: são nomes fictícios ou citados de forma genérica pela IA, então
-// uma "foto" de verdade seria enganosa; iniciais coloridas dão identidade visual sem inventar.
+// Os comentaristas citados em "Debate na Imprensa" são sempre figuras públicas reais (Jamie
+// Carragher, Alan Shearer, Fabrizio Romano, Vampeta...), então buscamos a foto real deles na
+// Wikipédia — mesmo padrão de fallback do resto do app: iniciais coloridas quando não encontra.
 const PALETTE = [
   'bg-rose-500/15 text-rose-700 dark:text-rose-400',
   'bg-amber-500/15 text-amber-700 dark:text-amber-400',
@@ -26,6 +29,28 @@ function initialsForName(name: string): string {
 }
 
 export function PunditAvatar({ name, className }: { name: string; className?: string }) {
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    setPhotoUrl(null)
+
+    fetch(`/api/pundits/photo?name=${encodeURIComponent(name)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { photoUrl?: string } | null) => {
+        if (!cancelled && data?.photoUrl) setPhotoUrl(data.photoUrl)
+      })
+      .catch(() => {})
+
+    return () => {
+      cancelled = true
+    }
+  }, [name])
+
+  if (photoUrl) {
+    return <img src={photoUrl} alt={name} className={cn('rounded-full object-cover shrink-0', className)} />
+  }
+
   return (
     <div
       className={cn(
