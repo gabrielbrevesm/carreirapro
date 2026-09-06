@@ -5,6 +5,8 @@ import { MASTER_SYSTEM_PROMPT, buildUserMessage } from '@/lib/ai/article-prompt'
 import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { checkAndReserveQuota } from '@/lib/supabase/quota'
+import { classifyEventType } from '@/lib/mock/event-classifier'
+import { computeMediaCoverage } from '@/lib/media'
 import type { Career, CareerMemory } from '@/types'
 import type { AiArticleResponse } from '@/lib/ai/types'
 
@@ -41,7 +43,14 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now()
 
   try {
-    const userText = buildUserMessage({ ...body, hasAttachment: !!body.attachmentUrl })
+    // Motor de "media intelligence" (src/lib/media): decide QUEM comenta e por quê, ANTES da IA
+    // escrever — a IA só decide COMO escrever, nunca escolhe os jornalistas sozinha (ver §82 do
+    // pedido do usuário). A classificação de evento aqui é só pra alimentar o motor; o eventType
+    // que efetivamente vai pro artigo continua vindo da resposta da IA (parsed.eventType).
+    const appEventType = classifyEventType(body.rawInput)
+    const mediaCoverage = computeMediaCoverage({ career: body.career, memory: body.memory, rawInput: body.rawInput, appEventType })
+
+    const userText = buildUserMessage({ ...body, hasAttachment: !!body.attachmentUrl, mediaBrief: mediaCoverage.brief })
 
     // Print/foto do save anexado (calendário, resultados, elenco...) — o modelo já é
     // multimodal (gpt-4o), então mandamos a imagem como parte da própria mensagem em vez de
@@ -75,6 +84,7 @@ export async function POST(req: NextRequest) {
       modelUsed: model,
       tokensUsed: completion.usage?.total_tokens ?? 0,
       generationTimeMs: Date.now() - startTime,
+      mediaSelection: mediaCoverage.selection,
     })
   } catch (error) {
     console.error('[/api/articles/generate]', error)

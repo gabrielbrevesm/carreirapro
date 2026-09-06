@@ -30,7 +30,7 @@ function randomInt(min: number, max: number): number {
 
 // Extrai possíveis nomes próprios do texto do usuário (heurística simples).
 // Ignora a primeira palavra de cada frase (maiúscula só por estar no início, não por ser nome).
-function extractProperNouns(text: string): string[] {
+export function extractProperNouns(text: string): string[] {
   const blacklist = new Set([
     'Ex', 'Eu', 'Na', 'No', 'Ao', 'Do', 'Da', 'Em', 'Um', 'Uma', 'Para', 'Depois', 'Vale', 'Segue',
     'Reconstruir', 'Sobreviver', 'Dominar', 'Conquistar', 'Vencer', 'Brigar', 'Manter', 'Buscar', 'Objetivo', 'Declarado',
@@ -61,7 +61,7 @@ function extractProperNouns(text: string): string[] {
 
 // Remove da lista qualquer "nome" que na verdade seja um clube ou competição conhecida
 // (o extrator de nomes próprios não distingue isso sozinho).
-function filterPlayerNames(names: string[], career: Career): string[] {
+export function filterPlayerNames(names: string[], career: Career): string[] {
   const blocked = new Set<string>([career.clubName.toLowerCase(), ...KNOWN_COMPETITIONS.map((c) => c.toLowerCase())])
   for (const club of CLUB_DATABASE) {
     blocked.add(club.name.toLowerCase())

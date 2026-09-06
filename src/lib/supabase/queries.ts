@@ -99,6 +99,7 @@ type MemoryRow = {
   key_signings: CareerMemory['keySignings']
   captain_name: string | null
   vice_captain_name: string | null
+  recent_journalists: CareerMemory['recentJournalists']
   updated_at: string
 }
 
@@ -114,6 +115,7 @@ export function rowToMemory(row: MemoryRow): CareerMemory {
     keySignings: row.key_signings ?? [],
     captainName: row.captain_name,
     viceCaptainName: row.vice_captain_name,
+    recentJournalists: row.recent_journalists ?? [],
     updatedAt: row.updated_at,
   }
 }
@@ -130,6 +132,7 @@ export function memoryToRow(memory: CareerMemory): MemoryRow {
     key_signings: memory.keySignings,
     captain_name: memory.captainName,
     vice_captain_name: memory.viceCaptainName,
+    recent_journalists: memory.recentJournalists,
     updated_at: memory.updatedAt,
   }
 }

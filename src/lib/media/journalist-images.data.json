@@ -1,0 +1,350 @@
+{
+  "abdulrahman-abed": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:46.065Z"
+  },
+  "ahmed-afifi": {
+    "status": "not_found",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Ahmed_Afifi",
+    "identityConfidence": 0.4,
+    "fetchedAt": "2026-09-06T19:43:43.679Z"
+  },
+  "andre-rizek": {
+    "status": "not_found",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Andr%C3%A9_Rizek",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:14.732Z"
+  },
+  "antonio-tadeia": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:35.018Z"
+  },
+  "ben-jacobs": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Ben_McKenzie",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:47.309Z"
+  },
+  "bixente-lizarazu": {
+    "status": "available",
+    "localPath": "/media/journalists/france/bixente-lizarazu.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Bixente_Lizarazu",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/9/98/Bixente_Lizarazu_%28cropped%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:27.996Z"
+  },
+  "christoph-kramer": {
+    "status": "available",
+    "localPath": "/media/journalists/germany/christoph-kramer.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Christoph_Kramer",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/3/33/Christoph_Kramer_2015.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:14.553Z"
+  },
+  "daniel-riolo": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:23.117Z"
+  },
+  "david-ornstein": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/David_Beckham",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:17.919Z"
+  },
+  "dietmar-hamann": {
+    "status": "available",
+    "localPath": "/media/journalists/germany/dietmar-hamann.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Dietmar_Hamann",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/81/Hamann%2C_Dietmar_%28cropped%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:13.642Z"
+  },
+  "fabio-caressa": {
+    "status": "available",
+    "localPath": "/media/journalists/italy/fabio-caressa.png",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Fabio_Caressa",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/04/FabioCaressa.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:33.857Z"
+  },
+  "fabrizio-romano": {
+    "status": "available",
+    "localPath": "/media/journalists/italy/fabrizio-romano.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Fabrizio_Romano",
+    "sourceUrl": "https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2a/Fabrizio_Romano_in_San_Mam%C3%A9s.jpg/3840px-Fabrizio_Romano_in_San_Mam%C3%A9s.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "license": "CC0",
+    "licenseUrl": "https://commons.wikimedia.org/wiki/File:Fabrizio_Romano_in_San_Mam%C3%A9s.jpg",
+    "author": "Nicolasviano21",
+    "attributionText": "Foto: Nicolasviano21",
+    "fetchedAt": "2026-09-06T19:43:30.260Z"
+  },
+  "flavio-azzaro": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Flavio_Azzaro",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:51.698Z"
+  },
+  "florian-plettenberg": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:44:11.724Z"
+  },
+  "gary-neville": {
+    "status": "available",
+    "localPath": "/media/journalists/england/gary-neville.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Gary_Neville",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Gary_Neville_2014_%28cropped%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:18.854Z"
+  },
+  "gianluca-di-marzio": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Gianni_Di_Marzio",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:29.257Z"
+  },
+  "guillem-balague": {
+    "status": "available",
+    "localPath": "/media/journalists/spain/guillem-balague.jpg",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Guillem_Balagu%C3%A9",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/2/26/2019_Guillem_Balagu%C3%A9_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:02.796Z"
+  },
+  "gustavo-lopez": {
+    "status": "not_found",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Gustavo_L%C3%B3pez",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:52.719Z"
+  },
+  "henry-winter": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Henry_Winter",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:20.642Z"
+  },
+  "herculez-gomez": {
+    "status": "available",
+    "localPath": "/media/journalists/usa/herculez-gomez.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Herculez_Gomez",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/82/Herculez_G%C3%B3mez.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:58.223Z"
+  },
+  "jamie-carragher": {
+    "status": "available",
+    "localPath": "/media/journalists/england/jamie-carragher.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Jamie_Carragher",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Football_against_poverty_2014_-_Jamie_Carragher_%28cropped%29.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:19.756Z"
+  },
+  "juan-pablo-varsky": {
+    "status": "available",
+    "localPath": "/media/journalists/argentina/juan-pablo-varsky.jpg",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Juan_Pablo_Varsky",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/0/0f/L%C3%ADnea_de_tiempo_%2815859430407%29_%28cropped%29.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:48.506Z"
+  },
+  "julio-maldonado-maldini": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:59.267Z"
+  },
+  "lele-adani": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:32.737Z"
+  },
+  "leonardo-bertozzi": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:16.047Z"
+  },
+  "loic-tanzi": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:25.537Z"
+  },
+  "lothar-matthaus": {
+    "status": "available",
+    "localPath": "/media/journalists/germany/lothar-matthaus.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Lothar_Matth%C3%A4us",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/8/84/2019_Lothar_Matth%C3%A4us.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:12.775Z"
+  },
+  "luis-cristovao": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/History_of_SE_Palmeiras",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:37.730Z"
+  },
+  "mariano-closs": {
+    "status": "available",
+    "localPath": "/media/journalists/argentina/mariano-closs.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Mariano_Closs",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Mariano_closs.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:49.661Z"
+  },
+  "matt-doyle": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Cristiano_Ronaldo",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:57.357Z"
+  },
+  "mauro-cezar-pereira": {
+    "status": "available",
+    "localPath": "/media/journalists/brazil/mauro-cezar-pereira.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Mauro_Cezar_Pereira",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/9/9d/Maurocezar_senadobr.JPG?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:13.746Z"
+  },
+  "mehmet-demirkol": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:44:04.893Z"
+  },
+  "miguel-quintana": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Javier_Milei",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:44:00.487Z"
+  },
+  "paolo-condo": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Roberto_Baggio",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:31.511Z"
+  },
+  "paul-tenorio": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/United_States_men's_national_soccer_team",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:55.150Z"
+  },
+  "paulo-vinicius-coelho": {
+    "status": "not_found",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Paulo_Vin%C3%ADcius_Coelho",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:12.492Z"
+  },
+  "pedro-henriques": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Pedro_Henriques",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:41.552Z"
+  },
+  "rafael-oliveira": {
+    "status": "not_found",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Rafael_Oliveira",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:16.704Z"
+  },
+  "raphael-honigstein": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Raphael_Honigstein",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:10.535Z"
+  },
+  "ridvan-dilmen": {
+    "status": "available",
+    "localPath": "/media/journalists/turkey/ridvan-dilmen.jpg",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/R%C4%B1dvan_Dilmen",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/53/R%C4%B1dvan_Dilmen.jpg?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:07.219Z"
+  },
+  "rory-smith": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Rory_Smith_(journalist)",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:21.926Z"
+  },
+  "rui-malheiro": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:39.390Z"
+  },
+  "santi-gimenez": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Santiago_Gim%C3%A9nez",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:44:03.681Z"
+  },
+  "sebastian-vignolo": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:50.816Z"
+  },
+  "serdar-ali-celikler": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:44:09.573Z"
+  },
+  "sid-lowe": {
+    "status": "available",
+    "localPath": "/media/journalists/spain/sid-lowe.png",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Sid_Lowe",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/4/4b/SidLoweWeekly.png?utm_source=en.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:44:01.565Z"
+  },
+  "taylor-twellman": {
+    "status": "available",
+    "localPath": "/media/journalists/usa/taylor-twellman.jpg",
+    "sourcePageUrl": "https://pt.wikipedia.org/wiki/Taylor_Twellman",
+    "sourceUrl": "https://upload.wikimedia.org/wikipedia/commons/5/5d/TaylorTwellman_2006_MLS_Cup.jpg?utm_source=pt.wikipedia.org&utm_campaign=api&utm_content=thumbnail_unscaled",
+    "sourceType": "wikimedia_commons",
+    "identityConfidence": 1,
+    "fetchedAt": "2026-09-06T19:43:56.080Z"
+  },
+  "tom-bogert": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/Roberto_Baggio",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:53.931Z"
+  },
+  "tomas-da-cunha": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/University_of_Lisbon_(1911%E2%80%932013)",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:40.596Z"
+  },
+  "turki-al-awad": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:44.887Z"
+  },
+  "ugur-karakullukcu": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:44:08.390Z"
+  },
+  "ugur-meleke": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:44:06.039Z"
+  },
+  "vincent-duluc": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:24.403Z"
+  },
+  "walid-acherchour": {
+    "status": "not_found",
+    "fetchedAt": "2026-09-06T19:43:26.982Z"
+  },
+  "walid-al-farraj": {
+    "status": "not_found",
+    "sourcePageUrl": "https://en.wikipedia.org/wiki/List_of_former_Muslims",
+    "identityConfidence": 0,
+    "fetchedAt": "2026-09-06T19:43:42.747Z"
+  }
+}

@@ -21,6 +21,7 @@ import { generateMockArticle, generateHiringAnnouncementArticle, extractMockMemo
 import { generateMockArticleImage } from '@/lib/mock/image-generator'
 import { analyzeMockSquad } from '@/lib/mock/squad-analyzer'
 import { classifyEventType, extractCompetition } from '@/lib/mock/event-classifier'
+import { applyMediaCoverageToMemory } from '@/lib/media'
 import { isAllowed, remainingFor, type UsageField } from '@/lib/freemium'
 import {
   tryGenerateArticleWithAI,
@@ -73,6 +74,7 @@ function emptyMemory(careerId: string): CareerMemory {
     keySignings: [],
     captainName: null,
     viceCaptainName: null,
+    recentJournalists: [],
     updatedAt: new Date().toISOString(),
   }
 }
@@ -593,6 +595,11 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         establishedFacts: [...memory.establishedFacts, ...memoryUpdates.newFacts].slice(-50),
         recentResults: memoryUpdates.resultToAdd ? [...memory.recentResults, memoryUpdates.resultToAdd].slice(-10) : memory.recentResults,
         keySignings: memoryUpdates.signingToAdd ? [...memory.keySignings, memoryUpdates.signingToAdd].slice(-20) : memory.keySignings,
+        // Continuidade/overuse do motor de mídia — só atualiza quando a matéria realmente usou
+        // jornalistas selecionados pelo motor (ver src/lib/media).
+        recentJournalists: aiResult?.mediaSelection
+          ? applyMediaCoverageToMemory(memory, aiResult.mediaSelection)
+          : memory.recentJournalists,
         updatedAt: new Date().toISOString(),
       }
 

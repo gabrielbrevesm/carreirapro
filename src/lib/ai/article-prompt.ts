@@ -378,43 +378,20 @@ Não atribua dez falas diferentes em toda matéria. Priorize qualidade.
 
 6. REPERCUSSÃO DE COMENTARISTAS
 
-Crie um pequeno painel com dois a quatro nomes relevantes.
+Você NÃO escolhe os jornalistas/comentaristas — isso já foi decidido por um motor editorial
+próprio, de forma contextual (país, liga, clube, competição, importância do acontecimento), antes
+desta chamada. A mensagem do usuário traz um bloco "JORNALISTAS AUTORIZADOS PARA ESTA MATÉRIA"
+(ou a instrução explícita de não incluir nenhum) — siga ESSE bloco à risca:
 
-Exemplos:
+- use exclusivamente os nomes, veículos, papéis e perspectivas listados ali;
+- nunca invente ou substitua por outro jornalista real que você conheça, mesmo que pareça mais
+  óbvio para o contexto — a decisão de quem fala já foi tomada;
+- se o bloco disser que nenhum jornalista foi selecionado, não crie uma seção de "Debate na
+  Imprensa" — o acontecimento simplesmente não gerou repercussão externa;
+- cada jornalista deve comentar exatamente sob a perspectiva indicada para ele, com o tom e o
+  sentimento sugeridos — isso é o que garante que dois nomes não digam a mesma coisa.
 
-Itália:
-- Fabio Caressa;
-- Alessandro Costacurta;
-- Fabio Capello;
-- Beppe Bergomi;
-- Daniele De Rossi;
-- Alessandro Del Piero;
-- Arrigo Sacchi.
-
-Inglaterra:
-- Gary Neville;
-- Jamie Carragher;
-- Roy Keane;
-- Micah Richards;
-- Rio Ferdinand;
-- Alan Shearer;
-- Thierry Henry.
-
-Brasil:
-- Paulo Vinícius Coelho;
-- Leonardo Bertozzi;
-- Luís Roberto;
-- Caio Ribeiro.
-
-Os comentários devem apresentar visões diferentes.
-
-Um pode elogiar.
-
-Outro pode alertar.
-
-Outro pode discordar.
-
-Não faça todos dizerem a mesma coisa.
+Você decide COMO cada um fala (o texto, a voz, o jeito de se expressar) — nunca QUEM fala.
 
 7. REDES SOCIAIS
 
@@ -1258,8 +1235,9 @@ export function buildUserMessage(params: {
   rawInput: string
   isFirstEvent: boolean
   hasAttachment?: boolean
+  mediaBrief?: string
 }): string {
-  const { career, memory, rawInput, isFirstEvent, hasAttachment } = params
+  const { career, memory, rawInput, isFirstEvent, hasAttachment, mediaBrief } = params
   const parts: string[] = []
 
   const today = new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -1297,6 +1275,10 @@ export function buildUserMessage(params: {
     parts.push(
       '\nO usuário também anexou uma imagem (print/foto do save — pode ser tela de resultados, calendário, elenco, etc). Extraia dela todos os fatos relevantes (placares, adversários, datas, jogadores, estatísticas) e trate como informação real e confirmada, com a mesma prioridade do texto acima — nunca invente o que não conseguir ler com clareza na imagem.'
     )
+  }
+
+  if (mediaBrief) {
+    parts.push(`\n${mediaBrief}`)
   }
 
   return parts.join('\n')

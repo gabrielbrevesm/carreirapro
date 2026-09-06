@@ -2,11 +2,16 @@
 
 import type { Article, Career, CareerMemory, CharacterId } from '@/types'
 import type { AiArticleResponse } from '@/lib/ai/types'
+import type { MediaSelectionResult } from '@/lib/media/types'
 
 export type AiArticleResult = AiArticleResponse & {
   modelUsed: string
   tokensUsed: number
   generationTimeMs: number
+  // Seleção do motor de "media intelligence" (src/lib/media) pra esta matéria — quem comentou e
+  // por quê. Usado só pra atualizar a continuidade/overuse na memória da carreira; a IA já
+  // escreveu o texto usando exatamente esses nomes.
+  mediaSelection?: MediaSelectionResult
 }
 
 export type AiCharacterResult = {
