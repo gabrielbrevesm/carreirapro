@@ -9,7 +9,7 @@ import { LandingPageV2 } from '@/components/marketing/LandingPageV2'
 
 // Landing em teste (conceito "central de comando" escuro) — pra voltar pra versão anterior,
 // troque só esta linha pra 'v1' e reimplante. A v1 continua 100% intacta em LandingPage.tsx.
-const ACTIVE_LANDING: 'v1' | 'v2' = 'v2'
+const ACTIVE_LANDING: 'v1' | 'v2' = 'v1'
 
 export default function RootPage() {
   const router = useRouter()
