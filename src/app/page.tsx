@@ -5,6 +5,11 @@ import { useRouter } from 'next/navigation'
 import { useMockData } from '@/lib/mock/store'
 import { LoadingSpinner } from '@/components/shared/LoadingSpinner'
 import { LandingPage } from '@/components/marketing/LandingPage'
+import { LandingPageV2 } from '@/components/marketing/LandingPageV2'
+
+// Landing em teste (conceito "central de comando" escuro) — pra voltar pra versão anterior,
+// troque só esta linha pra 'v1' e reimplante. A v1 continua 100% intacta em LandingPage.tsx.
+const ACTIVE_LANDING: 'v1' | 'v2' = 'v2'
 
 export default function RootPage() {
   const router = useRouter()
@@ -20,5 +25,5 @@ export default function RootPage() {
     return <LoadingSpinner label="Carregando..." className="min-h-screen" />
   }
 
-  return <LandingPage />
+  return ACTIVE_LANDING === 'v2' ? <LandingPageV2 /> : <LandingPage />
 }
