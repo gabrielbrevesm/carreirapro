@@ -128,3 +128,39 @@
     @apply font-sans;
   }
 }
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  20% {
+    transform: translateY(-2px) rotate(-3deg);
+  }
+  40% {
+    transform: translateY(0) rotate(3deg);
+  }
+  60% {
+    transform: translateY(-1px) rotate(-2deg);
+  }
+  80% {
+    transform: translateY(0) rotate(1deg);
+  }
+}
+
+.animate-wiggle {
+  animation: wiggle 1.4s ease-in-out infinite;
+}
+
+/* Acessibilidade global: usuários que pedem menos movimento no SO não devem receber as
+   transições de entrada/hover da landing v2 (fade/slide via tw-animate-css) nem microinterações
+   como o wiggle do onboarding. Vale pro app inteiro, não só pra v2. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -21,7 +21,8 @@ import { generateMockArticle, generateHiringAnnouncementArticle, extractMockMemo
 import { generateMockArticleImage } from '@/lib/mock/image-generator'
 import { analyzeMockSquad } from '@/lib/mock/squad-analyzer'
 import { classifyEventType, extractCompetition } from '@/lib/mock/event-classifier'
-import { isAllowed, remainingFor, canCreateCareer, type UsageField } from '@/lib/freemium'
+import { applyMediaCoverageToMemory } from '@/lib/media'
+import { isAllowed, remainingFor, type UsageField } from '@/lib/freemium'
 import {
   tryGenerateArticleWithAI,
   tryGenerateImageWithAI,
@@ -73,6 +74,7 @@ function emptyMemory(careerId: string): CareerMemory {
     keySignings: [],
     captainName: null,
     viceCaptainName: null,
+    recentJournalists: [],
     updatedAt: new Date().toISOString(),
   }
 }
@@ -134,6 +136,10 @@ type MockDataContextValue = {
   getCareerBySlug: (slug: string) => Career | undefined
   getMostRecentCareer: () => Career | undefined
   getCareerMemory: (careerId: string) => CareerMemory
+  updateCareerProfile: (
+    careerId: string,
+    fields: Partial<Pick<Career, 'managerPhotoUrl' | 'playingStyle' | 'preferredFormation' | 'personalTastes' | 'careerMilestones'>>
+  ) => Promise<{ ok: boolean }>
 
   generateArticleForCareer: (careerId: string, input: GenerateArticleInput) => Promise<GenerateArticleResult>
   generateImageForArticle: (articleId: string) => Promise<GenerateImageResult>
@@ -156,7 +162,6 @@ type MockDataContextValue = {
 
   usageRemaining: (field: UsageField) => number | null
   isFeatureAllowed: (field: UsageField) => boolean
-  canCreateNewCareer: () => boolean
   refreshProfile: () => Promise<UserPlan>
 }
 
@@ -324,6 +329,10 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         currentSeason: input.seasonStart,
         eventsCount: 1,
         isActive: true,
+        playingStyle: null,
+        preferredFormation: null,
+        personalTastes: null,
+        careerMilestones: null,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
@@ -374,14 +383,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         generationTimeMs = mockGenerated.generationTimeMs
       }
 
-      // Imagem da matéria de boas-vindas é gerada de imediato e não consome a cota gratuita
-      // (é uma demonstração da experiência, não uma geração real solicitada pelo usuário).
-      const welcomeImageUrl = generateMockArticleImage({
-        headline,
-        clubName: career.clubName,
-        eventType: 'season_start',
-      })
-
       const article: Article = {
         id: randomId(),
         careerId: career.id,
@@ -396,9 +397,12 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         modelUsed,
         tokensUsed,
         generationTimeMs,
-        imageUrl: welcomeImageUrl,
-        imagePrompt: `mock-prompt:${headline}`,
-        imageStatus: 'ready',
+        // Assim como qualquer outra matéria: fica "pending" e quem exibe a matéria dispara a
+        // geração real da imagem (ver useEffect no onboarding) — antes isso ficava travado num
+        // placeholder mock que nunca virava imagem de verdade.
+        imageUrl: null,
+        imagePrompt: null,
+        imageStatus: 'pending',
         audioUrl: null,
         shareToken: newShareToken(),
         createdAt: new Date().toISOString(),
@@ -442,6 +446,38 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     [state.careerMemories]
   )
 
+  // Tela "Técnico" da carreira — foto (troca a do técnico real/fictício) e o perfil pessoal
+  // opcional que a IA passa a usar como contexto extra ao escrever as matérias.
+  const updateCareerProfile = useCallback(
+    async (careerId: string, fields: Partial<Pick<Career, 'managerPhotoUrl' | 'playingStyle' | 'preferredFormation' | 'personalTastes' | 'careerMilestones'>>) => {
+      const updatedAt = new Date().toISOString()
+      const columnMap: Record<string, string> = {
+        managerPhotoUrl: 'manager_photo_url',
+        playingStyle: 'playing_style',
+        preferredFormation: 'preferred_formation',
+        personalTastes: 'personal_tastes',
+        careerMilestones: 'career_milestones',
+      }
+      const row: Record<string, unknown> = { updated_at: updatedAt }
+      for (const [key, value] of Object.entries(fields)) {
+        row[columnMap[key]] = value
+      }
+
+      const { error } = await supabase.from('careers').update(row).eq('id', careerId)
+      if (error) {
+        console.error('[updateCareerProfile] falha ao salvar', error)
+        return { ok: false }
+      }
+
+      setState((s) => ({
+        ...s,
+        careers: s.careers.map((c) => (c.id === careerId ? { ...c, ...fields, updatedAt } : c)),
+      }))
+      return { ok: true }
+    },
+    [supabase]
+  )
+
   const generateArticleForCareer = useCallback(
     async (careerId: string, input: GenerateArticleInput): Promise<GenerateArticleResult> => {
       const career = state.careers.find((c) => c.id === careerId)
@@ -456,7 +492,13 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
 
       let aiResult: Awaited<ReturnType<typeof tryGenerateArticleWithAI>>
       try {
-        aiResult = await tryGenerateArticleWithAI({ career, memory, rawInput: input.rawInput, isFirstEvent: false })
+        aiResult = await tryGenerateArticleWithAI({
+          career,
+          memory,
+          rawInput: input.rawInput,
+          isFirstEvent: false,
+          attachmentUrl: input.attachmentUrl,
+        })
       } catch (error) {
         // Cota esgotada de verdade (verificada no servidor) — nunca cai pro mock aqui, senão o
         // usuário continuaria gerando conteúdo "grátis" pra sempre.
@@ -553,6 +595,11 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
         establishedFacts: [...memory.establishedFacts, ...memoryUpdates.newFacts].slice(-50),
         recentResults: memoryUpdates.resultToAdd ? [...memory.recentResults, memoryUpdates.resultToAdd].slice(-10) : memory.recentResults,
         keySignings: memoryUpdates.signingToAdd ? [...memory.keySignings, memoryUpdates.signingToAdd].slice(-20) : memory.keySignings,
+        // Continuidade/overuse do motor de mídia — só atualiza quando a matéria realmente usou
+        // jornalistas selecionados pelo motor (ver src/lib/media).
+        recentJournalists: aiResult?.mediaSelection
+          ? applyMediaCoverageToMemory(memory, aiResult.mediaSelection)
+          : memory.recentJournalists,
         updatedAt: new Date().toISOString(),
       }
 
@@ -896,7 +943,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
 
   const usageRemaining = useCallback((field: UsageField) => remainingFor(state.plan, state.usage, field), [state.plan, state.usage])
   const isFeatureAllowed = useCallback((field: UsageField) => isAllowed(state.plan, state.usage, field), [state.plan, state.usage])
-  const canCreateNewCareer = useCallback(() => canCreateCareer(state.plan, state.careers.length), [state.plan, state.careers.length])
 
   // Rebusca plano/uso reais do banco — chamado depois de voltar do checkout do Stripe (o
   // webhook já deve ter persistido o plano 'pro' a essa altura) em vez de fingir localmente
@@ -937,6 +983,7 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     getCareerBySlug,
     getMostRecentCareer,
     getCareerMemory,
+    updateCareerProfile,
     generateArticleForCareer,
     generateImageForArticle,
     generateSpeechForArticle,
@@ -955,7 +1002,6 @@ export function MockDataProvider({ children }: { children: ReactNode }) {
     clearLatestCharacterNotification,
     usageRemaining,
     isFeatureAllowed,
-    canCreateNewCareer,
     refreshProfile,
   }
 

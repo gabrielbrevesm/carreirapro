@@ -8,10 +8,9 @@ import { Sparkles, Newspaper, ImageIcon, Users, Trophy, Loader2 } from 'lucide-r
 import { toast } from 'sonner'
 
 const FEATURE_MESSAGES: Record<string, string> = {
-  articles: 'Você usou sua geração gratuita de matéria. Assine para continuar.',
-  images: 'Você usou sua imagem editorial gratuita. Assine para gerar mais.',
+  articles: 'Você atingiu o limite de 5 matérias gratuitas. Assine o Pro para continuar gerando matérias em qualquer carreira.',
+  images: 'Não foi possível gerar a imagem gratuitamente. Assine o Pro para continuar.',
   squad_analysis: 'Análise de elenco é exclusiva do plano Pro.',
-  new_career: 'Sua primeira carreira é gratuita. Para criar mais carreiras, assine o Pro.',
 }
 
 export function Paywall({ feature }: { feature?: string }) {
@@ -46,10 +45,10 @@ export function Paywall({ feature }: { feature?: string }) {
         <CardContent className="space-y-4">
           <div className="space-y-3">
             {[
-              { icon: Newspaper, text: 'Matérias jornalísticas ilimitadas' },
+              { icon: Newspaper, text: 'Matérias ilimitadas, em quantas carreiras você quiser' },
               { icon: ImageIcon, text: 'Imagens editoriais ilimitadas' },
               { icon: Users, text: 'Análise de elenco com sugestões de contratação' },
-              { icon: Trophy, text: 'Crie mais de uma carreira ao mesmo tempo' },
+              { icon: Trophy, text: 'Sem limite de carreiras em paralelo' },
             ].map(({ icon: Icon, text }) => (
               <div key={text} className="flex items-center gap-3 text-sm">
                 <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">

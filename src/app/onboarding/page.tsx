@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Newspaper, Loader2, Send, ArrowRight, ArrowLeft, Search, BookOpen, Camera, ImageIcon } from 'lucide-react'
+import { Newspaper, Loader2, Send, ArrowRight, ArrowLeft, Search, BookOpen, Camera, ImageIcon, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
@@ -36,11 +36,17 @@ type Step =
 
 type Turn = { question: string; answer: string }
 
-const INTRO_MESSAGES = ['Preparando sua redação...', 'Toda grande cobertura começa com uma boa história.', 'Vamos entender quem você é nessa carreira.']
+const INTRO_MESSAGES = [
+  { title: 'Preparando sua redação', body: 'Toda carreira nova merece uma cobertura à altura — e é isso que vamos montar agora.' },
+  { title: 'Toda grande cobertura começa com uma boa história', body: 'Quanto mais riqueza de detalhes você nos der, mais afiadas ficam as matérias.' },
+  { title: 'Vamos entender quem você é nessa carreira', body: 'Algumas perguntas rápidas e sua redação particular já começa a escrever.' },
+]
 
 function Bubble({ from, children }: { from: 'bot' | 'user'; children: React.ReactNode }) {
   return (
-    <div className={`flex ${from === 'user' ? 'justify-end' : 'justify-start'}`}>
+    <div
+      className={`flex animate-in fade-in slide-in-from-bottom-1 duration-300 ${from === 'user' ? 'justify-end' : 'justify-start'}`}
+    >
       <div
         className={`max-w-[85%] px-4 py-2.5 text-sm leading-relaxed ${
           from === 'user'
@@ -56,7 +62,8 @@ function Bubble({ from, children }: { from: 'bot' | 'user'; children: React.Reac
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const { state, isHydrated, createCareerAndFirstArticle, canCreateNewCareer, getMostRecentCareer } = useMockData()
+  const { state, isHydrated, createCareerAndFirstArticle, getMostRecentCareer, generateImageForArticle, getArticleById } =
+    useMockData()
   const scrollRef = useRef<HTMLDivElement>(null)
 
   const [step, setStep] = useState<Step>('intro')
@@ -83,29 +90,34 @@ export default function OnboardingPage() {
   const [resultArticle, setResultArticle] = useState<Article | null>(null)
   const [resultSlug, setResultSlug] = useState<string | null>(null)
 
+  // Reflete as atualizações da matéria (imageStatus indo de pending → generating → ready) —
+  // resultArticle é só o snapshot no momento da criação, o estado real vive no store.
+  const liveResultArticle = resultArticle ? (getArticleById(resultArticle.id) ?? resultArticle) : null
+
+  // Mesmo padrão usado na página de matéria e no feed da carreira: a matéria nasce com a
+  // imagem "pending" e quem exibe é quem dispara a geração real (evita travar o fim do
+  // onboarding esperando ~20-40s de pipeline de imagem).
+  useEffect(() => {
+    if (!liveResultArticle || liveResultArticle.imageStatus !== 'pending') return
+    const timer = setTimeout(() => {
+      generateImageForArticle(liveResultArticle.id)
+    }, 1200)
+    return () => clearTimeout(timer)
+  }, [liveResultArticle, generateImageForArticle])
+
   useEffect(() => {
     if (isHydrated && !state.isAuthenticated) router.replace('/login')
   }, [isHydrated, state.isAuthenticated, router])
 
-  const eligibilityCheckedRef = useRef(false)
-  useEffect(() => {
-    // Só verifica uma vez, na hidratação inicial — evita competir com a criação
-    // da carreira que acontece mais adiante neste mesmo fluxo.
-    if (!isHydrated || eligibilityCheckedRef.current) return
-    eligibilityCheckedRef.current = true
-    if (!canCreateNewCareer()) router.replace('/settings?paywall=new_career')
-  }, [isHydrated, canCreateNewCareer, router])
+  const isLastIntroMessage = introMessageIndex >= INTRO_MESSAGES.length - 1
 
-  // Intro com microinterações: alterna mensagens antes de começar as perguntas
-  useEffect(() => {
-    if (step !== 'intro') return
-    if (introMessageIndex >= INTRO_MESSAGES.length - 1) {
-      const timer = setTimeout(() => setStep('manager_type'), 1100)
-      return () => clearTimeout(timer)
+  const handleIntroAdvance = () => {
+    if (isLastIntroMessage) {
+      setStep('manager_type')
+    } else {
+      setIntroMessageIndex((i) => i + 1)
     }
-    const timer = setTimeout(() => setIntroMessageIndex((i) => i + 1), 900)
-    return () => clearTimeout(timer)
-  }, [step, introMessageIndex])
+  }
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' })
@@ -262,7 +274,9 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    // h-dvh (não min-h-screen): no mobile, 100vh ignora o teclado virtual abrindo — o rodapé
+    // com o campo de texto ficava escondido atrás dele. dvh acompanha a altura visível de verdade.
+    <div className="h-dvh flex flex-col bg-background overflow-hidden">
       <header className="flex items-center gap-2 px-4 py-4 border-b shrink-0">
         <Button variant="ghost" size="icon" className="-ml-2" onClick={handleBack}>
           <ArrowLeft className="w-4 h-4" />
@@ -274,15 +288,39 @@ export default function OnboardingPage() {
       </header>
 
       {step === 'intro' ? (
-        <div className="flex-1 flex flex-col items-center justify-center gap-4 px-6 text-center">
-          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-primary animate-pulse" />
+        <button
+          type="button"
+          onClick={handleIntroAdvance}
+          className="flex-1 flex flex-col items-center justify-center gap-6 px-6 text-center cursor-pointer"
+        >
+          <div className="flex gap-1.5">
+            {INTRO_MESSAGES.map((_, i) => (
+              <span
+                key={i}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  i === introMessageIndex ? 'w-6 bg-primary' : i < introMessageIndex ? 'w-1.5 bg-primary/50' : 'w-1.5 bg-muted'
+                }`}
+              />
+            ))}
           </div>
-          <p className="text-muted-foreground max-w-xs transition-opacity duration-300">{INTRO_MESSAGES[introMessageIndex]}</p>
-          <p className="text-sm text-muted-foreground/70 max-w-xs">
-            Para escrever do jeito certo, precisamos conhecer a história que você quer viver.
-          </p>
-        </div>
+
+          <div key={introMessageIndex} className="flex flex-col items-center gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-primary" />
+            </div>
+            <div className="space-y-2 max-w-xs">
+              <p className="font-semibold text-lg leading-snug">{INTRO_MESSAGES[introMessageIndex].title}</p>
+              <p className="text-sm text-muted-foreground leading-relaxed">{INTRO_MESSAGES[introMessageIndex].body}</p>
+            </div>
+          </div>
+
+          <div className="mt-2 flex flex-col items-center gap-2">
+            <div className="animate-wiggle inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-medium shadow-sm">
+              {isLastIntroMessage ? 'Vamos começar' : 'Toque para continuar'}
+              <ChevronRight className="w-4 h-4" />
+            </div>
+          </div>
+        </button>
       ) : (
         <>
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-3 max-w-lg w-full mx-auto">
@@ -327,11 +365,11 @@ export default function OnboardingPage() {
               </div>
             )}
 
-            {step === 'result' && resultArticle && (
+            {step === 'result' && liveResultArticle && (
               <div className="pt-2 space-y-4">
                 <Bubble from="bot">Pronto! Aqui está a primeira matéria da sua carreira:</Bubble>
                 <div className="rounded-2xl border bg-card overflow-hidden">
-                  <ArticleRenderer article={resultArticle} />
+                  <ArticleRenderer article={liveResultArticle} />
                 </div>
               </div>
             )}

@@ -13,6 +13,8 @@ import {
   Users,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ArticleShowcase } from '@/components/marketing/ArticleShowcase'
+import { ContactsShowcase } from '@/components/marketing/ContactsShowcase'
 
 const display = Bebas_Neue({
   subsets: ['latin'],
@@ -96,21 +98,21 @@ const STEPS = [
   {
     n: '04',
     title: 'Vire Pro quando quiser',
-    body: 'Mais carreiras em paralelo, análise de elenco e sugestões de contratação sob medida.',
+    body: 'Matérias ilimitadas depois da 5ª, análise de elenco e sugestões de contratação sob medida.',
   },
 ]
 
 const FREE_ITEMS = [
-  '1ª carreira ilimitada, gere quantas matérias quiser',
-  'Questionário de história do técnico do seu save',
-  'Imagens editoriais em todas as matérias da sua primeira carreira',
-  'Timeline completa da carreira',
+  'Crie quantas carreiras quiser, sem limite',
+  '5 matérias grátis, somando todas as suas carreiras',
+  'Imagens editoriais em cada matéria gerada',
+  'Timeline completa de cada carreira',
   'Contatos: receba mensagens do presidente do clube, do diretor esportivo e departamento médico',
 ]
 
 const PRO_ITEMS = [
-  'Crie quantas carreiras quiser, ainda mais liberdade',
-  'Tudo do plano Free em cada uma delas',
+  'Matérias ilimitadas, em quantas carreiras você tiver',
+  'Tudo do plano Free, sem limite de volume',
   'Análise de elenco por IA',
   'Sugestões de contratação por estilo de jogo',
   'Feed de mercado dos últimos 30 dias',
@@ -131,8 +133,8 @@ const FAQ = [
     a: 'Sim. É uma assinatura mensal, sem fidelidade. Cancele quando quiser direto nas configurações da sua conta.',
   },
   {
-    q: 'E se eu quiser jogar mais de uma carreira ao mesmo tempo?',
-    a: 'Sua primeira carreira é gratuita para sempre, com matérias e imagens ilimitadas. Pra criar uma segunda carreira em paralelo, é só assinar o Pro.',
+    q: 'Quantas carreiras posso ter no plano gratuito?',
+    a: 'Quantas quiser — o limite do Free não é por carreira, é por matéria: são 5 matérias grátis somando todas as suas carreiras. Pra continuar gerando depois disso, é só assinar o Pro.',
   },
 ]
 
@@ -165,6 +167,9 @@ export function LandingPage() {
             </a>
             <a href="#como-funciona" className="transition-colors hover:text-[#12151A]">
               Como funciona
+            </a>
+            <a href="#exemplos" className="transition-colors hover:text-[#12151A]">
+              Exemplos
             </a>
             <a href="#planos" className="transition-colors hover:text-[#12151A]">
               Planos
@@ -228,7 +233,7 @@ export function LandingPage() {
                 </Button>
               </div>
               <p className="mt-4 [font-family:var(--font-geist-mono)] text-xs tracking-wide text-[#12151A]/50 uppercase">
-                PRIMEIRA CARREIRA 100% GRATUITA - SEM CARTÃO PARA COMEÇAR
+                5 MATÉRIAS GRÁTIS, EM QUANTAS CARREIRAS QUISER - SEM CARTÃO PARA COMEÇAR
               </p>
             </div>
 
@@ -307,6 +312,23 @@ export function LandingPage() {
           </div>
         </section>
 
+        {/* Contatos */}
+        <section id="contatos" className="bg-white px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <div className="max-w-2xl">
+              <p className="[font-family:var(--font-geist-mono)] text-xs font-medium tracking-[0.2em] text-[#1E8F5E] uppercase">
+                A diretoria também fala com você
+              </p>
+              <h2 className={`${displayFont} mt-3 text-4xl tracking-wide sm:text-5xl`}>SUA CAIXA DE ENTRADA GANHA VIDA</h2>
+              <p className="mt-4 text-[#12151A]/70">
+                Presidente, diretor esportivo e departamento médico mandam mensagem direto pra você — como colegas de
+                trabalho, não comunicados oficiais. É a bastidor da sua carreira, não só a manchete.
+              </p>
+            </div>
+            <ContactsShowcase />
+          </div>
+        </section>
+
         {/* Como funciona */}
         <section id="como-funciona" className="bg-white px-4 py-20 sm:px-6">
           <div className="mx-auto max-w-6xl">
@@ -337,6 +359,13 @@ export function LandingPage() {
                 </div>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Exemplos de matérias */}
+        <section id="exemplos" className="px-4 py-20 sm:px-6">
+          <div className="mx-auto max-w-6xl">
+            <ArticleShowcase />
           </div>
         </section>
 

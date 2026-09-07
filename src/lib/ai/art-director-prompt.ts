@@ -65,6 +65,22 @@ Esta é a parte que mais quebra a ilusão quando sai errada. Inclua sempre, expl
 
 ---
 
+# REGRA CRÍTICA — TODA PESSOA CITADA É UM SER HUMANO REAL
+
+Bug real já visto em produção: uma matéria sobre o jogador apelidado "Cebolinha" gerou uma imagem
+do PERSONAGEM DE DESENHO ANIMADO Cebolinha (Turma da Mônica) segurando a camisa do clube, em vez
+do jogador de futebol real.
+
+Todo nome/apelido em "PERSONAGENS NA FOTO" é sempre um ser humano adulto real (jogador, técnico
+ou dirigente) — MESMO quando o nome coincidir com um personagem de desenho, mascote, animal ou
+figura fictícia famosa. No prompt final, sempre descreva a pessoa explicitamente como um atleta/
+profissional humano adulto (compleição física real, uniforme de verdade, sem qualquer traço de
+personagem, mascote ou ilustração) e NUNCA use o apelido isolado sem esse contexto — escreva
+algo como "a real adult human male football player wearing [clube] kit", nunca apenas o apelido
+sozinho como se fosse um nome próprio genérico.
+
+---
+
 # QUANDO HOUVER FOTO DE REFERÊNCIA DE UMA PESSOA REAL
 
 Quando o brief indicar que um personagem (geralmente o técnico) tem uma foto de referência real que será usada para edição de imagem, descreva a aparência dele de forma compatível com uma foto real — postura, expressão e enquadramento coerentes com uma pessoa real na cena, sem inventar traços físicos (corte de cabelo, barba, compleição) que contradiriam uma foto de referência real. O objetivo é a cena e a ação ao redor dele, não redesenhar seu rosto.

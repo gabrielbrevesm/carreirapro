@@ -30,7 +30,7 @@ function randomInt(min: number, max: number): number {
 
 // Extrai possíveis nomes próprios do texto do usuário (heurística simples).
 // Ignora a primeira palavra de cada frase (maiúscula só por estar no início, não por ser nome).
-function extractProperNouns(text: string): string[] {
+export function extractProperNouns(text: string): string[] {
   const blacklist = new Set([
     'Ex', 'Eu', 'Na', 'No', 'Ao', 'Do', 'Da', 'Em', 'Um', 'Uma', 'Para', 'Depois', 'Vale', 'Segue',
     'Reconstruir', 'Sobreviver', 'Dominar', 'Conquistar', 'Vencer', 'Brigar', 'Manter', 'Buscar', 'Objetivo', 'Declarado',
@@ -61,7 +61,7 @@ function extractProperNouns(text: string): string[] {
 
 // Remove da lista qualquer "nome" que na verdade seja um clube ou competição conhecida
 // (o extrator de nomes próprios não distingue isso sozinho).
-function filterPlayerNames(names: string[], career: Career): string[] {
+export function filterPlayerNames(names: string[], career: Career): string[] {
   const blocked = new Set<string>([career.clubName.toLowerCase(), ...KNOWN_COMPETITIONS.map((c) => c.toLowerCase())])
   for (const club of CLUB_DATABASE) {
     blocked.add(club.name.toLowerCase())
@@ -300,27 +300,25 @@ function buildOngoingDebate(career: Career, sentimentBias: 'positive' | 'negativ
   return blocks
 }
 
-// ─── Próximos jogos (inventados de forma plausível) ──────────
+// ─── Próximos jogos (só quando o usuário realmente informou o adversário) ──
 
-function buildUpcomingFixtures(career: Career, memory: CareerMemory): FixturePreview[] {
-  const excludeNames = new Set([career.clubName, ...memory.rivalries.map((r) => r.rivalClub)])
-  const sameLeague = CLUB_DATABASE.filter((c) => c.league === career.clubLeague && !excludeNames.has(c.name))
-  const pool = sameLeague.length >= 3 ? sameLeague : CLUB_DATABASE.filter((c) => !excludeNames.has(c.name))
-  const chosen = pickMany(pool, 3)
+const NEXT_MATCH_KEYWORDS = [
+  'próximo jogo', 'próxima partida', 'próxima rodada', 'próximo compromisso',
+  'vamos enfrentar', 'vamos encarar', 'jogo contra', 'partida contra', 'jogamos contra',
+  'na próxima', 'daqui a', 'semana que vem enfrentamos',
+]
 
-  const notes = [
-    'Provavelmente o jogo mais difícil da sequência.',
-    'Adversário direto — pode significar ganhar posições importantes na tabela.',
-    'O típico confronto em que o time precisa confirmar favoritismo.',
-    'Compromisso que serve de termômetro para a sequência da temporada.',
-  ]
-  const dots: FixturePreview['dot'][] = ['red', 'gray', 'green']
+// Nunca inventa adversários futuros — só preenche quando o relato do usuário
+// explicitamente menciona o próximo jogo e cita um clube real da base.
+function buildUpcomingFixtures(career: Career, rawInput: string): FixturePreview[] {
+  const normalizedInput = rawInput.toLowerCase()
+  const mentionsUpcoming = NEXT_MATCH_KEYWORDS.some((k) => normalizedInput.includes(k))
+  if (!mentionsUpcoming) return []
 
-  return chosen.map((club, i) => ({
-    opponent: club.name,
-    note: pick(notes),
-    dot: dots[i % dots.length],
-  }))
+  const opponent = findClubMentioned(rawInput, career.clubName)
+  if (!opponent) return []
+
+  return [{ opponent, note: 'Mencionado no seu relato como o próximo compromisso.', dot: 'gray' }]
 }
 
 // ─── Resultados recentes (agrupados) ─────────────────────────
@@ -532,7 +530,7 @@ export function generateMockArticle(params: {
     recentResults: eventType === 'match_result' ? buildRecentResultsDisplay(career, memory, currentResultRecord) : [],
     standingsContext: eventType === 'match_result' ? buildStandingsContext(career, memory, currentResultRecord) : '',
     playerAnalysis: buildPlayerAnalysis(career, memory, playerNames),
-    upcomingFixtures: buildUpcomingFixtures(career, memory),
+    upcomingFixtures: buildUpcomingFixtures(career, rawInput),
     pressDebate: buildOngoingDebate(career, sentimentBias, eventType),
     socialMedia: buildSocialMedia(career, playerNames, 'ongoing'),
     backstage: `Nos bastidores do ${career.clubName}, fontes próximas ao elenco indicam que o vestiário segue unido em torno do trabalho de ${career.managerName}, mesmo com a pressão externa crescendo a cada rodada.`,

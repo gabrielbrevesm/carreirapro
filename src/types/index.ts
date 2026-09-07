@@ -41,6 +41,12 @@ export type Career = {
   currentSeason: string | null
   eventsCount: number
   isActive: boolean
+  // Perfil pessoal do técnico — tudo opcional, preenchido na tela "Técnico" da carreira.
+  // Quando presente, a IA usa como contexto extra ao escrever as matérias.
+  playingStyle: string | null
+  preferredFormation: string | null
+  personalTastes: string | null
+  careerMilestones: string | null
   createdAt: string
   updatedAt: string
 }
@@ -69,6 +75,16 @@ export type CareerMemory = {
   // o personagem paralelo "Capitão" nunca se manifesta.
   captainName: string | null
   viceCaptainName: string | null
+  // Continuidade/overuse do motor de mídia (src/lib/media) — quais jornalistas já apareceram
+  // nesta carreira, quando e com que posição/sentimento, pra decidir reaparições com contexto
+  // em vez de repetir os mesmos nomes sem motivo.
+  recentJournalists: Array<{
+    journalistId: string
+    lastUsedAt: string
+    usageCount: number
+    previousPositions: string[]
+    sentimentHistory: string[]
+  }>
   updatedAt: string
 }
 

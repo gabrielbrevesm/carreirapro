@@ -5,7 +5,8 @@ import { useMockData } from '@/lib/mock/store'
 import { CareerCard } from '@/components/career/CareerCard'
 import { NewCareerButton } from '@/components/career/NewCareerButton'
 import { EmptyState } from '@/components/shared/EmptyState'
-import { Card, CardContent } from '@/components/ui/card'
+import { BoleiroInsights } from '@/components/dashboard/BoleiroInsights'
+import { cn } from '@/lib/utils'
 import { Trophy, Newspaper, Sparkles } from 'lucide-react'
 
 export default function DashboardPage() {
@@ -15,6 +16,12 @@ export default function DashboardPage() {
   const totalArticles = articles.length
   const activeCareers = careers.filter((c) => c.isActive).length
 
+  const stats = [
+    { icon: Trophy, value: String(activeCareers), label: 'Carreiras ativas' },
+    { icon: Newspaper, value: String(totalArticles), label: 'Matérias publicadas' },
+    { icon: Sparkles, value: plan === 'pro' ? 'Pro' : 'Gratuito', label: 'Plano atual', gold: plan === 'pro' },
+  ]
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between gap-3">
@@ -23,42 +30,6 @@ export default function DashboardPage() {
           <p className="text-muted-foreground text-sm mt-1">Visão geral de todas as suas carreiras.</p>
         </div>
         <NewCareerButton />
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="pt-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Trophy className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold leading-none">{activeCareers}</p>
-              <p className="text-xs text-muted-foreground mt-1">Carreiras ativas</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Newspaper className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold leading-none">{totalArticles}</p>
-              <p className="text-xs text-muted-foreground mt-1">Matérias publicadas</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <p className="text-2xl font-bold leading-none capitalize">{plan === 'pro' ? 'Pro' : 'Gratuito'}</p>
-              <p className="text-xs text-muted-foreground mt-1">Plano atual</p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
       <div className="space-y-3">
@@ -85,6 +56,34 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+      </div>
+
+      <BoleiroInsights />
+
+      <div className="flex flex-wrap items-center gap-2 rounded-2xl border bg-card px-2 py-2 sm:gap-0 sm:divide-x">
+        {stats.map(({ icon: Icon, value, label, gold }) => (
+          <div key={label} className="flex flex-1 items-center gap-2.5 px-2.5 py-1 sm:px-4">
+            <div
+              className={cn(
+                'flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
+                gold ? 'bg-gradient-to-br from-amber-200 via-yellow-400 to-amber-600' : 'bg-primary/10'
+              )}
+            >
+              <Icon className={cn('h-4 w-4', gold ? 'text-amber-950' : 'text-primary')} />
+            </div>
+            <div className="min-w-0">
+              <p
+                className={cn(
+                  'text-base font-bold leading-none capitalize',
+                  gold && 'bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-500 bg-clip-text text-transparent'
+                )}
+              >
+                {value}
+              </p>
+              <p className="mt-1 truncate text-[11px] text-muted-foreground leading-none">{label}</p>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   )

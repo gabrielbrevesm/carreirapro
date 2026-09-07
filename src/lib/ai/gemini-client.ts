@@ -15,6 +15,22 @@ function getGeminiImageModel(): string {
 
 type GeminiInlineImage = { mimeType: string; data: string }
 
+// Reforço de estilo aplicado a TODA geração, além do que o Diretor de Arte (GPT) já escreve no
+// prompt — texto vindo de outro modelo varia turno a turno; este prefixo/sufixo fixo garante que
+// as palavras-chave que mais combatem a "cara de IA" cheguem sempre ao Gemini, na mesma forma.
+const REALISM_PREFIX =
+  'RAW unedited photograph, real photojournalism, shot on a professional DSLR camera — NOT a 3D render, NOT CGI, NOT an illustration, NOT airbrushed, NOT a video game screenshot. '
+// Rede de segurança contra um bug real: uma matéria sobre o jogador apelidado "Cebolinha" gerou
+// o PERSONAGEM DE DESENHO da Turma da Mônica em vez do jogador de futebol real, porque o apelido
+// sozinho é mais forte na associação do modelo do que o contexto. Esta frase vale pra QUALQUER
+// geração, independente do que o Diretor de Arte escreveu, exatamente por isso.
+const REALISM_SUFFIX =
+  ' Natural skin texture with visible pores and subtle imperfections, natural asymmetry, realistic film grain, true-to-life color grading — avoid smooth plastic skin, waxy skin, artificial symmetry, or an overly clean/digital look. Every person shown is a real adult human being (an athlete, coach, or staff member) — NEVER a cartoon character, comic-book character, mascot, costumed character, anime character, or any other fictional/animated figure, even if a name or nickname coincides with a famous unrelated character.'
+
+function buildRealisticPrompt(prompt: string): string {
+  return `${REALISM_PREFIX}${prompt}${REALISM_SUFFIX}`
+}
+
 type GeminiGenerateContentResponse = {
   candidates?: Array<{
     content?: {
@@ -39,7 +55,7 @@ export async function generateImageWithGemini(params: {
 
   const model = getGeminiImageModel()
   const parts: Array<{ text?: string; inline_data?: { mime_type: string; data: string } }> = [
-    { text: params.prompt },
+    { text: buildRealisticPrompt(params.prompt) },
   ]
   for (const ref of params.referenceImages ?? []) {
     parts.push({ inline_data: { mime_type: ref.mimeType, data: ref.data } })
@@ -50,7 +66,9 @@ export async function generateImageWithGemini(params: {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       contents: [{ parts }],
-      generationConfig: { responseModalities: ['IMAGE'] },
+      // Temperatura baixa: queremos a foto mais literal/consistente com o prompt e a foto de
+      // referência, não variações "criativas" — é isso que mais gera fuga de realismo.
+      generationConfig: { responseModalities: ['IMAGE'], temperature: 0.35 },
     }),
   })
 

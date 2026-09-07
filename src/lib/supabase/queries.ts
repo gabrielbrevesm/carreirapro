@@ -25,6 +25,10 @@ type CareerRow = {
   current_season: string | null
   events_count: number
   is_active: boolean
+  playing_style: string | null
+  preferred_formation: string | null
+  personal_tastes: string | null
+  career_milestones: string | null
   created_at: string
   updated_at: string
 }
@@ -47,6 +51,10 @@ export function rowToCareer(row: CareerRow): Career {
     currentSeason: row.current_season,
     eventsCount: row.events_count,
     isActive: row.is_active,
+    playingStyle: row.playing_style,
+    preferredFormation: row.preferred_formation,
+    personalTastes: row.personal_tastes,
+    careerMilestones: row.career_milestones,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -71,6 +79,10 @@ export function careerToRow(userId: string, career: Career): CareerRow {
     current_season: career.currentSeason,
     events_count: career.eventsCount,
     is_active: career.isActive,
+    playing_style: career.playingStyle,
+    preferred_formation: career.preferredFormation,
+    personal_tastes: career.personalTastes,
+    career_milestones: career.careerMilestones,
     created_at: career.createdAt,
     updated_at: career.updatedAt,
   }
@@ -87,6 +99,7 @@ type MemoryRow = {
   key_signings: CareerMemory['keySignings']
   captain_name: string | null
   vice_captain_name: string | null
+  recent_journalists: CareerMemory['recentJournalists']
   updated_at: string
 }
 
@@ -102,6 +115,7 @@ export function rowToMemory(row: MemoryRow): CareerMemory {
     keySignings: row.key_signings ?? [],
     captainName: row.captain_name,
     viceCaptainName: row.vice_captain_name,
+    recentJournalists: row.recent_journalists ?? [],
     updatedAt: row.updated_at,
   }
 }
@@ -118,6 +132,7 @@ export function memoryToRow(memory: CareerMemory): MemoryRow {
     key_signings: memory.keySignings,
     captain_name: memory.captainName,
     vice_captain_name: memory.viceCaptainName,
+    recent_journalists: memory.recentJournalists,
     updated_at: memory.updatedAt,
   }
 }
